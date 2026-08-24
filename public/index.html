@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="制造智能视觉质检与质量异常分析平台">
+  <title>Vision Quality Control</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">VQ</div>
+        <div>
+          <strong>Vision Quality</strong>
+          <span>制造质量控制台</span>
+        </div>
+      </div>
+      <nav class="side-nav" aria-label="主导航">
+        <button class="nav-item active" data-target="overview"><span class="nav-dot"></span>质量总览</button>
+        <button class="nav-item" data-target="inspect"><span class="nav-dot"></span>视觉质检</button>
+        <button class="nav-item" data-target="history"><span class="nav-dot"></span>检测记录</button>
+      </nav>
+      <div class="sidebar-note">
+        <span class="status-dot"></span>
+        <div>
+          <strong>推理服务在线</strong>
+          <small>Canvas adapter / YOLO-ready</small>
+        </div>
+      </div>
+      <div class="sidebar-footer">MFG INTELLIGENCE · 0.1.0</div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">制造智能 · 质量工程</p>
+          <h1>视觉质检控制台</h1>
+        </div>
+        <div class="topbar-actions">
+          <span class="date-label" id="todayLabel"></span>
+          <button class="ghost-button" id="refreshButton" type="button">刷新数据</button>
+        </div>
+      </header>
+
+      <section id="overview" class="view-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">实时状态</p>
+            <h2>生产质量总览</h2>
+          </div>
+          <span class="live-badge"><span class="status-dot"></span> LIVE</span>
+        </div>
+
+        <div class="metric-grid" id="metricGrid">
+          <article class="metric-card">
+            <span class="metric-label">今日检测批次</span>
+            <strong class="metric-value" id="metricInspections">--</strong>
+            <span class="metric-foot">已接入质量记录</span>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">平均质量分</span>
+            <strong class="metric-value" id="metricScore">--</strong>
+            <span class="metric-foot">基于最近检测结果</span>
+          </article>
+          <article class="metric-card warning-card">
+            <span class="metric-label">待复核风险</span>
+            <strong class="metric-value" id="metricRisk">--</strong>
+            <span class="metric-foot">中风险及以上记录</span>
+          </article>
+          <article class="metric-card accent-card">
+            <span class="metric-label">检测服务</span>
+            <strong class="metric-value metric-status">在线</strong>
+            <span class="metric-foot">API /inspect ready</span>
+          </article>
+        </div>
+
+        <div class="content-grid">
+          <article class="panel chart-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">最近趋势</p>
+                <h3>质量分与风险分布</h3>
+              </div>
+              <span class="panel-meta">最近 10 条</span>
+            </div>
+            <div class="trend-chart" id="trendChart" aria-label="质量分趋势图"></div>
+            <div class="legend-row">
+              <span><i class="legend-line score-line"></i>质量分</span>
+              <span><i class="legend-line risk-line"></i>风险分</span>
+            </div>
+          </article>
+
+          <article class="panel insight-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">辅助诊断</p>
+                <h3>风险贡献因子</h3>
+              </div>
+            </div>
+            <div id="contributorList" class="contributor-list"></div>
+            <p class="panel-caption">结果用于辅助复核，不替代质量工程师的因果判断。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="inspect" class="view-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">图像分析</p>
+            <h2>执行一次视觉质检</h2>
+          </div>
+          <span class="section-step">01 / 03</span>
+        </div>
+
+        <div class="inspection-layout">
+          <article class="panel form-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">输入数据</p>
+                <h3>批次与工艺参数</h3>
+              </div>
+              <span class="required-note">* 必填</span>
+            </div>
+            <form id="inspectionForm">
+              <div class="field-grid">
+                <label>
+                  <span>生产批次 *</span>
+                  <input id="batchId" name="batchId" value="B-20260824-03" required>
+                </label>
+                <label>
+                  <span>产线 *</span>
+                  <select id="line" name="line">
+                    <option>压延线 A</option>
+                    <option>表面处理线 B</option>
+                    <option>精整线 C</option>
+                  </select>
+                </label>
+                <label>
+                  <span>温度 / °C</span>
+                  <input id="temperature" name="temperature" type="number" step="0.1" value="68">
+                </label>
+                <label>
+                  <span>压力 / MPa</span>
+                  <input id="pressure" name="pressure" type="number" step="0.1" value="3.8">
+                </label>
+                <label>
+                  <span>速度 / m/min</span>
+                  <input id="speed" name="speed" type="number" step="1" value="42">
+                </label>
+                <label>
+                  <span>图像文件</span>
+                  <input id="imageInput" name="image" type="file" accept="image/*">
+                </label>
+              </div>
+              <p class="helper-text">图像先在浏览器端提取亮度、对比度、边缘密度与清晰度，再提交到质量分析 API。</p>
+              <button class="primary-button" id="runButton" type="submit">运行质量分析</button>
+              <p class="form-status" id="formStatus" aria-live="polite"></p>
+            </form>
+          </article>
+
+          <article class="panel image-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">视觉输入</p>
+                <h3>检测画面</h3>
+              </div>
+              <span class="panel-meta" id="imageState">等待图像</span>
+            </div>
+            <div class="image-stage" id="imageStage">
+              <canvas id="previewCanvas" width="720" height="420"></canvas>
+              <div class="image-empty" id="imageEmpty">
+                <div class="upload-mark">+</div>
+                <strong>选择一张生产图像</strong>
+                <span>支持 JPG / PNG，检测框将在此处显示</span>
+              </div>
+            </div>
+            <div class="image-metrics" id="imageMetrics">
+              <span>亮度 <b>--</b></span>
+              <span>对比度 <b>--</b></span>
+              <span>边缘密度 <b>--</b></span>
+              <span>清晰度 <b>--</b></span>
+            </div>
+          </article>
+        </div>
+
+        <div class="result-grid" id="resultGrid">
+          <article class="panel result-card">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">质量结果</p>
+                <h3>综合评分</h3>
+              </div>
+            </div>
+            <div class="score-display">
+              <strong id="resultScore">--</strong>
+              <span>/ 100</span>
+            </div>
+            <div class="score-bar"><i id="scoreBar"></i></div>
+            <p id="resultSummary" class="panel-caption">提交图像和工艺参数后查看分析结果。</p>
+          </article>
+          <article class="panel result-card">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">检测输出</p>
+                <h3>缺陷候选</h3>
+              </div>
+              <span class="risk-pill" id="resultRisk">等待分析</span>
+            </div>
+            <div id="detectionList" class="detection-list">
+              <p class="empty-line">暂无检测结果</p>
+            </div>
+          </article>
+          <article class="panel result-card">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">解释结果</p>
+                <h3>主要影响因素</h3>
+              </div>
+            </div>
+            <div id="resultContributors" class="contributor-list compact"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="history" class="view-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">可追溯记录</p>
+            <h2>检测历史</h2>
+          </div>
+          <span class="section-step">03 / 03</span>
+        </div>
+        <article class="panel table-panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>批次</th><th>产线</th><th>图像</th><th>质量分</th><th>风险</th><th>检测时间</th></tr>
+              </thead>
+              <tbody id="historyBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

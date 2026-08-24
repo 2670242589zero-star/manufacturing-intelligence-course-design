@@ -1,0 +1,33 @@
+{
+  "updatedAt": "2026-08-24",
+  "policy": "Only metadata is committed. Confirm source terms before downloading or redistributing image files.",
+  "datasets": [
+    {
+      "id": "neu-surface-defect",
+      "name": "NEU Surface Defect Database",
+      "domain": "Hot-rolled steel strip surface defects",
+      "scale": "1800 grayscale images, 6 defect classes",
+      "use": "Defect classification or detection adapter validation",
+      "url": "http://faculty.neu.edu.cn/songkechen/zh_CN/zdylm/263270/list/index.htm",
+      "redistribution": "Verify the current terms on the source page before use"
+    },
+    {
+      "id": "severstal-steel-defect",
+      "name": "Severstal: Steel Defect Detection",
+      "domain": "Steel surface segmentation",
+      "scale": "Labeled steel images with run-length encoded masks",
+      "use": "Optional YOLO or segmentation extension",
+      "url": "https://www.kaggle.com/c/severstal-steel-defect-detection",
+      "redistribution": "Kaggle authentication and competition terms apply"
+    },
+    {
+      "id": "dagm-2007",
+      "name": "DAGM 2007 Competition Dataset",
+      "domain": "Synthetic industrial surface defects",
+      "scale": "Multiple textured classes with defect labels",
+      "use": "Reproducible anomaly detection experiments",
+      "url": "https://hci.iwr.uni-heidelberg.de/content/weakly-supervised-learning-industrial-optical-inspection",
+      "redistribution": "Verify the current terms on the source page before use"
+    }
+  ]
+}

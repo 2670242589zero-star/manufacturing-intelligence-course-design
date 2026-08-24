@@ -1,14 +1,15 @@
 const http = require("node:http");
 const path = require("node:path");
 const fsp = require("node:fs/promises");
-const { analyzeVision } = require("./algorithm/vision");
 const { getPipeline } = require("./algorithm/pipeline");
+const { createInferenceAdapter } = require("./algorithm/inference-adapter");
 
 const PORT = Number(process.env.PORT || 4173);
 const ROOT = __dirname;
 const PUBLIC = path.join(ROOT, "public");
 const DATA_DIR = path.join(ROOT, "data");
 const DATA_FILE = path.join(DATA_DIR, "inspections.json");
+const SOURCES_FILE = path.join(DATA_DIR, "dataset-sources.json");
 const MIME = {
   ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8", ".json": "application/json; charset=utf-8",
@@ -57,8 +58,10 @@ function send(res, status, body, type = "application/json; charset=utf-8") {
 
 async function bodyOf(req) {
   let raw = "";
-  for await (const chunk of req) raw += chunk;
-  if (raw.length > 1024 * 1024) throw new Error("request_too_large");
+  for await (const chunk of req) {
+    raw += chunk;
+    if (raw.length > 1024 * 1024) throw new Error("request_too_large");
+  }
   return raw ? JSON.parse(raw) : {};
 }
 
@@ -81,12 +84,15 @@ async function serveStatic(req, res) {
   } catch { send(res, 404, { error: "not_found" }); }
 }
 
-function createServer() {
+function createServer(options = {}) {
+  const inference = options.inferenceAdapter || createInferenceAdapter(options.inferenceOptions);
   return http.createServer(async (req, res) => {
     try {
       if (req.method === "GET" && req.url === "/api/health") return send(res, 200, { ok: true, service: "vision-quality-api", time: new Date().toISOString() });
       if (req.method === "GET" && req.url === "/api/pipeline") return send(res, 200, getPipeline());
+      if (req.method === "GET" && req.url === "/api/model-status") return send(res, 200, inference.status());
       if (req.method === "GET" && req.url === "/api/dataset") return send(res, 200, dataset);
+      if (req.method === "GET" && req.url === "/api/dataset-sources") return send(res, 200, JSON.parse(await fsp.readFile(SOURCES_FILE, "utf8")));
       if (req.method === "GET" && req.url === "/api/inspections") return send(res, 200, { items: await readInspections() });
       if (req.method === "GET" && req.url === "/api/summary") {
         const items = await readInspections();
@@ -97,7 +103,7 @@ function createServer() {
       if (req.method === "POST" && req.url === "/api/inspect") {
         const payload = await bodyOf(req);
         validateInspection(payload);
-        const result = analyzeVision(payload.imageMetrics, payload.process);
+        const result = await inference.analyze(payload.imageMetrics, payload.process, { batchId: payload.batchId, line: payload.line, imageName: payload.imageName });
         const record = { id: "INSP-" + Date.now(), batchId: payload.batchId || "UNASSIGNED", line: payload.line || "未指定产线", imageName: payload.imageName || "browser-canvas", ...result };
         const items = await readInspections();
         await writeInspections([record, ...items]);

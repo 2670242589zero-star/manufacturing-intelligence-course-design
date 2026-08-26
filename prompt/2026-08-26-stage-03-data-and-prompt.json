@@ -66,7 +66,9 @@
   "upload": {
     "remote": "origin",
     "branch": "main",
-    "status": "pending-final-git-review"
+    "status": "completed",
+    "primaryCommit": "b56884c",
+    "pushedAt": "2026-08-26"
   },
   "uploadPolicy": {
     "rawData": "do-not-upload",
@@ -76,8 +78,6 @@
     "publicSample": "upload"
   },
   "nextSteps": [
-    "更新字段字典、数据源索引、项目 README 和进度计划。",
-    "检查 Git 暂存区后提交并推送 GitHub。",
     "继续完成工艺参数模型训练和 YOLO 推理服务接入，并为每个阶段新增 prompt 记录。"
   ]
 }

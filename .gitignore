@@ -1,6 +1,13 @@
 node_modules/
+.venv-yolo/
 data/inspections.json
 data/local/
+training/runs/
+models/
+runs/
+*.pt
+*.onnx
 _backups/
 制造智能技术课程设计任务书.pdf
 _pdf_pages/
+__pycache__/

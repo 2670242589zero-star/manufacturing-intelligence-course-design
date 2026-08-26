@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Process quality sample",
+  "description": "Normalized public sample for the manufacturing quality anomaly analysis demo.",
+  "type": "object",
+  "required": [
+    "sample_id",
+    "timestamp",
+    "iron_feed_pct",
+    "silica_feed_pct",
+    "starch_flow",
+    "amina_flow",
+    "ore_pulp_flow",
+    "ore_pulp_ph",
+    "ore_pulp_density",
+    "flotation_air_flow_avg",
+    "flotation_level_avg",
+    "iron_concentrate_pct",
+    "silica_concentrate_pct"
+  ],
+  "properties": {
+    "sample_id": { "type": "string", "pattern": "^MPQ-[0-9]{4}$", "description": "Repository sample identifier" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "iron_feed_pct": { "type": "number", "description": "Iron feed percentage" },
+    "silica_feed_pct": { "type": "number", "description": "Silica feed percentage" },
+    "starch_flow": { "type": "number", "unit": "t/h", "description": "Starch flow sensor" },
+    "amina_flow": { "type": "number", "unit": "t/h", "description": "Amina flow sensor" },
+    "ore_pulp_flow": { "type": "number", "unit": "m3/h", "description": "Ore pulp flow" },
+    "ore_pulp_ph": { "type": "number", "description": "Ore pulp pH" },
+    "ore_pulp_density": { "type": "number", "description": "Ore pulp density" },
+    "flotation_air_flow_avg": { "type": "number", "unit": "m3/h", "description": "Mean air flow across flotation columns" },
+    "flotation_level_avg": { "type": "number", "unit": "%", "description": "Mean level across flotation columns" },
+    "iron_concentrate_pct": { "type": "number", "description": "Iron concentrate percentage; excluded from the leakage-safe baseline" },
+    "silica_concentrate_pct": { "type": "number", "description": "Prediction target: silica concentrate percentage" }
+  },
+  "additionalProperties": false
+}

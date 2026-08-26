@@ -28,6 +28,15 @@
       "use": "Reproducible anomaly detection experiments",
       "url": "https://hci.iwr.uni-heidelberg.de/content/weakly-supervised-learning-industrial-optical-inspection",
       "redistribution": "Verify the current terms on the source page before use"
+    },
+    {
+      "id": "mining-process-quality",
+      "name": "Quality Prediction in a Mining Process",
+      "domain": "Iron ore flotation process quality prediction",
+      "scale": "Time-stamped process sensors and concentrate quality measurements",
+      "use": "Process parameter regression and anomaly detection baseline",
+      "url": "https://www.kaggle.com/datasets/edumagalhaes/quality-prediction-in-a-mining-process",
+      "redistribution": "Use the public sample only after checking the current dataset terms; do not commit the full download"
     }
   ]
 }

@@ -28,9 +28,20 @@
 - 将本地 YOLO11n 权重封装为 `/infer` 模型服务并接入平台真实图片链路。
 - 建立知识库、证据融合和处置推荐接口，补充真实推理截图、性能测试和课程设计报告。
 
+## 2026-08-26：阶段 5.2 数据与交流记录
+
+- 创建 `data/README.md`，明确公开样例、完整原始数据和模型产物的边界。
+- 新增 `process-quality-sample.csv`、`process-quality-schema.json` 和 `process-quality-data-card.md`，为工艺参数回归与异常检测准备可公开、可审查的最小样例。
+- 创建 `prompt/README.md` 和 `prompt/2026-08-26-stage-03-data-and-prompt.json`，记录任务书分析、选题去重、YOLO11n 训练、工艺参数模型规划以及本阶段文件变更。
+- 扩展 `data/data-dictionary.md` 和 `data/dataset-sources.json`，同步登记工艺质量字段与公开数据源。
+- 已确认本地 `quality-prediction.zip` 无法按标准 ZIP 展开；完整原始数据仍留在 `data/local/`，不作为公开仓库输入。
+- JSON 文件解析、CSV 结构和样例源数据逐行对照均通过。
+- `npm test` 通过 13/13；新增数据记录测试，并将数据源 API 断言从 3 个同步为 4 个。
+- 已创建 `_backups/step-07-data-and-prompts` 本地快照，共 106 个文件，排除原始数据、模型权重和运行输出。
+- 待完成：Git 暂存安全检查、提交和 GitHub 推送。
+
 ## 已知边界
 
 - 当前指标只代表 NEU-DET 数据分布，不代表生产现场精度。
 - crazing 类别性能较弱，需要补充样本或调整增强策略。
 - 根因分析仍为候选因素排序，不代表确定因果关系。
-

@@ -12,7 +12,8 @@ test("exposes model adapter status and public dataset source metadata", async ()
   const sources = await sourcesResponse.json();
   assert.equal(statusResponse.status, 200);
   assert.equal(status.configuredMode, "local");
-  assert.equal(sources.datasets.length, 3);
+  assert.equal(sources.datasets.length, 4);
+  assert.ok(sources.datasets.some((item) => item.id === "mining-process-quality"));
   assert.ok(sources.datasets.every((item) => item.url.startsWith("http")));
   await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
 });

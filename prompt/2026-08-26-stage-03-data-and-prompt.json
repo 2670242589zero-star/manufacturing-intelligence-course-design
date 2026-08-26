@@ -1,0 +1,83 @@
+{
+  "recordId": "2026-08-26-stage-03-data-and-prompt",
+  "date": "2026-08-26",
+  "stage": "stage-03",
+  "harness": "Codex",
+  "model": "GPT-5.6sol",
+  "userRequest": "为课程设计第3阶段补充可用数据文件，创建 prompt 目录保存 AI 交流记录，并在后续阶段持续同步；每阶段先本地备份，再按授权上传 GitHub。",
+  "context": {
+    "repository": "manufacturing-intelligence-course-design",
+    "remote": "https://github.com/2670242589zero-star/manufacturing-intelligence-course-design.git",
+    "localPath": "F:/DXB",
+    "branch": "main",
+    "baseCommit": "00e93c3"
+  },
+  "conversationSummary": [
+    {
+      "topic": "任务书与选题",
+      "summary": "完成任务书要求分析，并将题目确定为面向制造质量异常的多源证据融合与知识增强处置推荐平台，避开班级中已出现的单独缺陷检测、预测性维护、剩余寿命预测、工艺优化和生产调度题目。"
+    },
+    {
+      "topic": "视觉模型",
+      "summary": "使用现有 CUDA 环境完成 YOLO11n 在 NEU-DET 上的本地迁移训练、独立测试和 ONNX 导出；权重和原始图片只保存在本地。"
+    },
+    {
+      "topic": "工艺参数模型",
+      "summary": "规划使用 RandomForestRegressor 预测 % Silica Concentrate，并用 Isolation Forest 作为异常检测基线；按时间顺序处理数据，排除可能产生目标泄漏的 % Iron Concentrate。"
+    },
+    {
+      "topic": "仓库与 AI 工具",
+      "summary": "采用 Codex 作为 harness，模型选用 GPT-5.6sol，使用 GitHub 管理课程设计代码、文档和过程记录。"
+    }
+  ],
+  "actions": [
+    "读取 task_plan.md、progress.md、findings.md 和现有 data 文件。",
+    "检查本地工艺质量数据镜像和 NEU-DET 原始数据位置。",
+    "确认完整原始数据位于 data/local/，模型和训练运行目录不应进入公开仓库。",
+    "创建公开过程质量样例、JSON Schema、数据卡和 data/README.md。",
+    "创建 prompt/README.md 和本阶段 JSON 记录。"
+  ],
+  "findings": [
+    "仓库已有 data/ 目录和早期 6 行过程演示数据，但缺少工艺质量模型对应的公开样例与数据卡。",
+    "本地 quality-prediction.zip 无法按标准 ZIP 展开，因此不将其作为仓库输入或复现依据。",
+    "本地 Book1.csv 镜像包含分号分隔、逗号小数格式的矿石浮选过程字段，可抽取少量样例并规范化。",
+    "公开仓库需要持续排除 data/local/、models/、runs/、*.pt、*.onnx、密钥和企业敏感信息。"
+  ],
+  "artifacts": [
+    "data/README.md",
+    "data/process-quality-sample.csv",
+    "data/process-quality-schema.json",
+    "data/process-quality-data-card.md",
+    "prompt/README.md",
+    "prompt/2026-08-26-stage-03-data-and-prompt.json"
+  ],
+  "backup": {
+    "required": true,
+    "directory": "_backups/step-07-data-and-prompts",
+    "status": "completed",
+    "projectFileCount": 106
+  },
+  "validation": {
+    "json": "passed",
+    "csvStructure": "passed",
+    "sourceComparison": "passed",
+    "tests": "13/13 passed"
+  },
+  "upload": {
+    "remote": "origin",
+    "branch": "main",
+    "status": "pending-final-git-review"
+  },
+  "uploadPolicy": {
+    "rawData": "do-not-upload",
+    "weights": "do-not-upload",
+    "prompts": "upload-after-review",
+    "documentation": "upload",
+    "publicSample": "upload"
+  },
+  "nextSteps": [
+    "更新字段字典、数据源索引、项目 README 和进度计划。",
+    "检查 Git 暂存区后提交并推送 GitHub。",
+    "继续完成工艺参数模型训练和 YOLO 推理服务接入，并为每个阶段新增 prompt 记录。"
+  ]
+}

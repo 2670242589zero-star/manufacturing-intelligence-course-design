@@ -51,3 +51,13 @@
 - 计划预测 `% Silica Concentrate`；`% Iron Concentrate` 保留用于说明字段关系，但基线模型默认排除，避免后验质量信息造成目标泄漏。
 - `prompt/` 采用按日期、阶段和主题命名的 JSON 文件；记录包含 harness、模型、动作、发现、产物、备份状态和下一步，后续阶段继续追加。
 - 本阶段发现本地 `quality-prediction.zip` 不能被标准 ZIP 读取，因此只使用可读取的本地公开镜像抽取样例，并在数据卡中保留复现限制。
+
+## 第3阶段公开发布发现
+
+- 工艺质量原始公开页为 `https://www.kaggle.com/datasets/edumagalhaes/quality-prediction-in-a-mining-process`，Kaggle 页面明确标注 `CC0: Public Domain`。
+- 仓库内容应准确表述为“基于 CC0 原始公开数据加工的 10 行教学样例”，同时保留原始来源、许可、抽取行号、转换说明和使用边界。
+- 考核规则允许小型数据直接提交 `data/`；因此本阶段使用 GitHub 中的 CSV 作为加工样例公开地址，无需为了 10 行样例强制创建外部数据平台仓库。
+- 完整原始文件留在被忽略的 `data/local/`，公开仓库只提交 CSV、Schema、预处理索引和数据卡。
+- `process-quality-index.json` 可把原始 SHA-256、抽取行号和输出 SHA-256连成可审计链路，避免样例来源无法复现。
+- `% Iron Concentrate` 可能属于后验质量信息，工艺参数基线默认排除该字段；特征重要性只解释关联，不等同于因果关系。
+- 第三阶段自动化测试应在断言失败时也关闭 HTTP 服务，否则 Node 测试进程会因开放句柄挂起。

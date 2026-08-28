@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "manufacturing-quality-process-sample",
+  "description": "A 10-row educational sample derived from a CC0 public dataset.",
+  "source": {
+    "name": "Quality Prediction in a Mining Process",
+    "url": "https://www.kaggle.com/datasets/edumagalhaes/quality-prediction-in-a-mining-process",
+    "license": "CC0: Public Domain",
+    "localMirror": "data/local/mining-mirror-a/Book1.csv",
+    "sha256": "35fd3bea70843d59f14845a415ab7567744b4dbf75e6b9b64a9ad8a6293ca9cf",
+    "recordCount": 199,
+    "selectedRows": [
+      1,
+      2,
+      3,
+      4,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193
+    ],
+    "rowNumbering": "1-based data rows; header excluded"
+  },
+  "preprocessing": {
+    "script": "scripts/preprocess-process-quality.js",
+    "command": "npm run dataset:preprocess",
+    "rowSelector": "1,2,3,4,188,189,190,191,192,193",
+    "transformations": [
+      "parse semicolon-delimited rows",
+      "convert decimal commas to decimal points",
+      "convert month/day/year hour.minute timestamps to UTC ISO 8601",
+      "select representative process and quality fields",
+      "average seven flotation air-flow columns",
+      "average seven flotation level columns",
+      "add deterministic MPQ sample identifiers"
+    ]
+  },
+  "output": {
+    "file": "data/process-quality-sample.csv",
+    "schema": "data/process-quality-schema.json",
+    "sha256": "650bbc0bd169aab1cb6824ca2f91e8702fe53eac6e31cbed96c117ab4344e5bd",
+    "recordCount": 10,
+    "columnCount": 13,
+    "target": "silica_concentrate_pct",
+    "leakageRiskField": "iron_concentrate_pct"
+  },
+  "usageBoundary": "The sample is for teaching, API integration and preprocessing verification, not production performance claims."
+}

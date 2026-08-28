@@ -34,3 +34,8 @@ YYYY-MM-DD-stage-NN-topic.json
 5. 运行测试后提交并推送；若用户要求暂缓，则保留本地修改并明确记录未上传状态。
 
 上下文压缩前优先保存当前阶段 JSON、`progress.md` 和 `task_plan.md`，保证恢复后能从磁盘继续。
+
+## 当前记录
+
+- `2026-08-26-stage-03-data-and-prompt.json`：第三阶段数据目录、样例、Schema 和 AI 交流记录初始化。
+- `2026-08-28-stage-03-public-dataset.json`：公开来源引用、GitHub 加工样例发布、预处理、安全检查与同步记录。

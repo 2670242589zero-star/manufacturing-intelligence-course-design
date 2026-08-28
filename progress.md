@@ -46,3 +46,31 @@
 - 当前指标只代表 NEU-DET 数据分布，不代表生产现场精度。
 - crazing 类别性能较弱，需要补充样本或调整增强策略。
 - 根因分析仍为候选因素排序，不代表确定因果关系。
+
+## 2026-08-28：阶段 5.3 第三阶段数据收口
+
+- 已验证 `Quality Prediction in a Mining Process` 公开页面有效，许可为 `CC0: Public Domain`；NEU-DET、Severstal 和 DAGM 参考链接也可访问。
+- 已实现 `scripts/preprocess-process-quality.js`，通过 `npm run dataset:preprocess` 从本地忽略的公开数据镜像确定性生成 10 行、13 列样例。
+- 已生成 `data/process-quality-index.json`，记录原始 SHA-256、抽取行号 `1-4,188-193`、转换规则、输出 SHA-256、记录数和字段数。
+- 已将加工样例准确表述为“基于 CC0 原始公开数据加工的 10 行教学样例”，公开地址指向 GitHub 仓库中的 CSV。
+- 已补充根 README、`data/README.md`、两份数据卡、数据源登记和 `第三阶段自查.md`。
+- 已更新 `prompt/2026-08-28-stage-03-public-dataset.json`，记录 Codex、GPT-5.6sol、预处理、来源、安全边界、备份和上传状态。
+- 已新增预处理与索引一致性测试，并修复 API 测试失败时未关闭服务句柄的问题。
+- `npm test` 已通过 17/17；最终 Git 检查、本地备份、提交和 GitHub 推送正在执行。
+## 2026-08-28：阶段 5.3 收尾检查点
+
+- 已创建 `_backups/step-08-public-dataset/context-checkpoint-2026-08-28`，备份 20 个关键文件，包含 `prompt/`、规划文档、数据说明、预处理脚本和测试。
+- 已确认 `data/local/`、`models/`、`runs/`、`training/runs/` 和 `_backups/` 均被 `.gitignore` 排除，且未被 Git 跟踪。
+- 本地命令运行器的默认沙箱刷新失败，已改用经批准的项目范围命令继续检查；一次凭据扫描因 PowerShell 正则引号解析失败，随后已改用分组模式并通过复查。
+
+## 2026-08-28：阶段 5.3 最终验证
+
+- `npm run dataset:preprocess` 成功，重新生成 10 行、13 列样例与预处理索引。
+- 样例 SHA-256 为 `650bbc0bd169aab1cb6824ca2f91e8702fe53eac6e31cbed96c117ab4344e5bd`，与索引记录一致；原始公开数据镜像 SHA-256 为 `35fd3bea70843d59f14845a415ab7567744b4dbf75e6b9b64a9ad8a6293ca9cf`。
+- `npm test` 通过 17/17；6 个公开 JSON 文件均可解析；未发现过期发布占位文本。
+- 待提交范围内未发现超过 10 MB 的非忽略文件，也未发现常见私钥、GitHub Token、OpenAI Key 或 AWS Key 签名。
+
+## 2026-08-28：阶段 5.3 最终本地备份
+
+- 已创建 `_backups/step-08-public-dataset/final`，备份第三阶段 20 个关键文件；该目录受 `.gitignore` 保护，不上传 GitHub。
+- 最终备份包含公开样例、索引与数据卡、预处理脚本、测试、提示词记录、规划文件和自查文件。

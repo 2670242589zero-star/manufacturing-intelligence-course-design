@@ -6,10 +6,11 @@
 
 ## 来源与许可
 
-- 原始数据集：Mining Process / Quality Prediction in a Mining Process。
-- 公开来源标识：`edumagalhaes/quality-prediction-in-a-mining-process`。
+- 原始数据集：[Quality Prediction in a Mining Process](https://www.kaggle.com/datasets/edumagalhaes/quality-prediction-in-a-mining-process)。
+- 公开来源标识：`edumagalhaes/quality-prediction-in-a-mining-process`；Kaggle 元数据许可为 `CC0: Public Domain`。
 - 本仓库提交内容：从公开镜像抽取的 10 行规范化文本样例，不包含完整下载包。
-- 使用前应再次核对数据源页面的当前许可和引用要求；本项目只将样例用于课程设计演示、测试和方法说明。
+- 加工样例公开副本：[GitHub 中的 10 行 CSV](https://github.com/2670242589zero-star/manufacturing-intelligence-course-design/blob/main/data/process-quality-sample.csv)。
+- 本项目只将样例用于课程设计演示、测试和方法说明；引用时应同时保留原始 Kaggle 来源链接与加工说明。
 
 ## 处理规则
 
@@ -19,6 +20,8 @@
 4. 保留与工艺参数质量预测相关的代表性字段，并将 7 个浮选柱气流/液位字段分别聚合为均值字段。
 5. 完整实验应按时间排序后按 70%/15%/15% 划分训练、验证和测试集，不能随机打乱时间顺序。
 6. 计划以 `% Silica Concentrate` 为回归目标，使用 RandomForestRegressor 建立可解释基线，并以 Isolation Forest 做异常检测基线。
+
+可复现命令为 `npm run dataset:preprocess`。脚本默认抽取不含表头的第 `1-4,188-193` 行，并将原始文件与输出文件 SHA-256、字段数、记录数和转换规则写入 `process-quality-index.json`。
 
 ## 泄漏与解释边界
 

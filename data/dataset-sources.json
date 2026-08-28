@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-08-24",
-  "policy": "Only metadata is committed. Confirm source terms before downloading or redistributing image files.",
+  "updatedAt": "2026-08-28",
+  "policy": "Only small reviewable samples and metadata are committed. Confirm source terms before downloading or redistributing original files.",
   "datasets": [
     {
       "id": "neu-surface-defect",
@@ -36,7 +36,19 @@
       "scale": "Time-stamped process sensors and concentrate quality measurements",
       "use": "Process parameter regression and anomaly detection baseline",
       "url": "https://www.kaggle.com/datasets/edumagalhaes/quality-prediction-in-a-mining-process",
-      "redistribution": "Use the public sample only after checking the current dataset terms; do not commit the full download"
+      "license": "CC0: Public Domain",
+      "redistribution": "Only the normalized 10-row educational sample is committed; do not commit the full download"
+    },
+    {
+      "id": "manufacturing-quality-process-sample",
+      "name": "Manufacturing Quality Process Sample",
+      "domain": "Normalized educational sample for manufacturing process quality analysis",
+      "scale": "10 tabular records, 13 columns",
+      "use": "API integration, schema review, regression and anomaly-detection demonstration",
+      "url": "https://github.com/2670242589zero-star/manufacturing-intelligence-course-design/blob/main/data/process-quality-sample.csv",
+      "license": "CC0-1.0",
+      "derivedFrom": "https://www.kaggle.com/datasets/edumagalhaes/quality-prediction-in-a-mining-process",
+      "redistribution": "Publishes only the normalized CSV sample, JSON Schema, preprocessing index and dataset card"
     }
   ]
 }

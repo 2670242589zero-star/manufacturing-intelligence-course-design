@@ -1,5 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const crypto = require("node:crypto");
 const path = require("node:path");
 const fsp = require("node:fs/promises");
 
@@ -18,11 +19,23 @@ test("keeps the stage 3 public process sample structurally valid", async () => {
   }
 });
 
+test("keeps the preprocessing index aligned with the committed sample", async () => {
+  const sample = await fsp.readFile(path.join(projectRoot, "data", "process-quality-sample.csv"), "utf8");
+  const index = JSON.parse(await fsp.readFile(path.join(projectRoot, "data", "process-quality-index.json"), "utf8"));
+  const digest = crypto.createHash("sha256").update(sample).digest("hex");
+  assert.equal(index.source.sha256, "35fd3bea70843d59f14845a415ab7567744b4dbf75e6b9b64a9ad8a6293ca9cf");
+  assert.deepEqual(index.source.selectedRows, [1, 2, 3, 4, 188, 189, 190, 191, 192, 193]);
+  assert.equal(index.output.sha256, digest);
+  assert.equal(index.output.recordCount, 10);
+  assert.equal(index.output.columnCount, 13);
+});
+
 test("keeps dataset metadata, schema and prompt records parseable", async () => {
   const files = [
     path.join(projectRoot, "data", "dataset-sources.json"),
     path.join(projectRoot, "data", "process-quality-schema.json"),
-    path.join(projectRoot, "prompt", "2026-08-26-stage-03-data-and-prompt.json")
+    path.join(projectRoot, "prompt", "2026-08-26-stage-03-data-and-prompt.json"),
+    path.join(projectRoot, "prompt", "2026-08-28-stage-03-public-dataset.json")
   ];
   const parsed = [];
   for (const file of files) {
@@ -32,4 +45,22 @@ test("keeps dataset metadata, schema and prompt records parseable", async () => 
   assert.equal(parsed[1].required.includes("sample_id"), true);
   assert.equal(parsed[2].harness, "Codex");
   assert.equal(parsed[2].model, "GPT-5.6sol");
+  assert.equal(parsed[3].harness, "Codex");
+  assert.equal(parsed[3].model, "GPT-5.6sol");
+  assert.equal(parsed[3].sourceDataset.license, "CC0: Public Domain");
+});
+
+test("documents public dataset citations and publication target", async () => {
+  const readme = await fsp.readFile(path.join(projectRoot, "README.md"), "utf8");
+  const dataReadme = await fsp.readFile(path.join(projectRoot, "data", "README.md"), "utf8");
+  const card = await fsp.readFile(path.join(projectRoot, "data", "process-quality-publication-card.md"), "utf8");
+  const sources = JSON.parse(await fsp.readFile(path.join(projectRoot, "data", "dataset-sources.json"), "utf8"));
+  const miningUrl = "https://www.kaggle.com/datasets/edumagalhaes/quality-prediction-in-a-mining-process";
+  const sampleUrl = "https://github.com/2670242589zero-star/manufacturing-intelligence-course-design/blob/main/data/process-quality-sample.csv";
+  assert.ok(readme.includes(miningUrl));
+  assert.ok(dataReadme.includes(miningUrl));
+  assert.ok(card.includes(miningUrl));
+  assert.ok(readme.includes(sampleUrl));
+  assert.equal(sources.datasets.find((item) => item.id === "mining-process-quality").license, "CC0: Public Domain");
+  assert.equal(sources.datasets.find((item) => item.id === "manufacturing-quality-process-sample").url, sampleUrl);
 });

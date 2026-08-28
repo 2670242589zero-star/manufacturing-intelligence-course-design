@@ -2,10 +2,11 @@
   "name": "manufacturing-intelligence-course-design",
   "version": "0.3.0",
   "private": true,
-  "description": "智能视觉质检与质量异常分析平台 MVP",
+  "description": "面向制造质量异常的多源证据融合与知识增强处置推荐平台",
   "scripts": {
     "start": "node server.js",
     "test": "node --test \"test/*.test.js\"",
-    "dataset:import": "node scripts/import-dataset.js"
+    "dataset:import": "node scripts/import-dataset.js",
+    "dataset:preprocess": "node scripts/preprocess-process-quality.js"
   }
 }

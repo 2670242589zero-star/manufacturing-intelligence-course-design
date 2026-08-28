@@ -6,6 +6,7 @@
 
 ```bash
 npm test
+npm run dataset:preprocess
 npm start
 ```
 
@@ -24,6 +25,19 @@ npm start
 ```
 
 当前 Demo 使用浏览器 Canvas 指标和可解释规则评分，接口已经按后续接入 OpenCV、YOLO11n、工艺参数模型和 GPT-5.6sol 辅助摘要预留边界。系统输出是“异常证据与处置候选辅助分析”，不宣称自动确定因果关系。
+
+## 数据集与引用
+
+项目只在 GitHub 中保存小型、可审查的样例和元数据。完整原始下载、NEU-DET 图片与标签、训练权重和运行输出均保留在本地忽略目录，不随代码仓库分发。
+
+| 数据集 | 项目用途 | 来源与许可 |
+| --- | --- | --- |
+| [NEU Surface Defect Database](http://faculty.neu.edu.cn/songkechen/zh_CN/zdylm/263270/list/index.htm) | YOLO11n 钢材表面缺陷检测训练与验证 | 使用前核对来源页当前条款；本仓库不再分发原始图片和标签 |
+| [Severstal: Steel Defect Detection](https://www.kaggle.com/c/severstal-steel-defect-detection) | 可选的钢材缺陷分割扩展 | Kaggle 账号、竞赛规则和数据条款适用 |
+| [DAGM 2007 Competition Dataset](https://hci.iwr.uni-heidelberg.de/content/weakly-supervised-learning-industrial-optical-inspection) | 可选的工业表面异常检测实验 | 使用前核对来源页当前条款 |
+| [Quality Prediction in a Mining Process](https://www.kaggle.com/datasets/edumagalhaes/quality-prediction-in-a-mining-process) | 工艺参数回归与异常检测基线 | Kaggle 元数据标注为 `CC0: Public Domain` |
+
+[`data/process-quality-sample.csv`](https://github.com/2670242589zero-star/manufacturing-intelligence-course-design/blob/main/data/process-quality-sample.csv) 是基于上述矿石浮选公开数据加工的 10 行教学样例：统一时间、分隔符和小数格式，对 7 个浮选柱气流/液位字段分别取均值，并增加确定性的 `sample_id`。运行 `npm run dataset:preprocess` 可从本地忽略的公开数据镜像重新生成样例及 `data/process-quality-index.json`；索引记录原始 SHA-256、抽取行号 `1-4,188-193`、转换规则和输出 SHA-256。该样例仅用于接口联调、字段审查和方法演示，不能替代完整训练集，也不能据此宣称生产现场精度。
 
 ## 目录
 

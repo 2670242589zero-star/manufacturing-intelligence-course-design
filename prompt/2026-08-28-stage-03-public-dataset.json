@@ -1,0 +1,72 @@
+{
+  "recordId": "2026-08-28-stage-03-public-dataset",
+  "date": "2026-08-28",
+  "stage": "stage-03",
+  "harness": "Codex",
+  "model": "GPT-5.6sol",
+  "userRequest": "准备第三阶段公开数据、完成可复现预处理、保存 AI 交流记录、自查后本地备份并上传 GitHub。",
+  "sourceDataset": {
+    "name": "Quality Prediction in a Mining Process",
+    "url": "https://www.kaggle.com/datasets/edumagalhaes/quality-prediction-in-a-mining-process",
+    "license": "CC0: Public Domain"
+  },
+  "publishedDataset": {
+    "name": "manufacturing-quality-process-sample",
+    "description": "基于 CC0 原始公开数据加工的 10 行教学样例",
+    "platform": "GitHub",
+    "url": "https://github.com/2670242589zero-star/manufacturing-intelligence-course-design/blob/main/data/process-quality-sample.csv",
+    "status": "ready-for-upload",
+    "files": [
+      "data/process-quality-sample.csv",
+      "data/process-quality-schema.json",
+      "data/process-quality-index.json",
+      "data/process-quality-data-card.md",
+      "data/process-quality-publication-card.md"
+    ]
+  },
+  "preprocessing": {
+    "script": "scripts/preprocess-process-quality.js",
+    "command": "npm run dataset:preprocess",
+    "sourceRows": "1-4,188-193",
+    "outputRows": 10,
+    "outputColumns": 13
+  },
+  "actions": [
+    "核对 GitHub 仓库、第三阶段数据文件和 Git 忽略规则。",
+    "运行预处理脚本，生成规范化 CSV 和包含输入输出哈希的索引。",
+    "补充根 README、数据目录说明、数据卡、公开链接和第三阶段自查。",
+    "增加预处理单元测试、索引一致性测试和 API 数据源测试。",
+    "确认小型加工样例按考核要求直接提交 GitHub，不上传完整原始数据、图片、权重或运行目录。"
+  ],
+  "security": {
+    "credentialsRecorded": false,
+    "rawDatasetUploaded": false,
+    "modelWeightsUploaded": false,
+    "ignoredPathsChecked": [
+      "data/local/",
+      "models/",
+      "runs/",
+      "training/runs/",
+      "_backups/"
+    ]
+  },
+  "backup": {
+    "required": true,
+    "directory": "_backups/step-08-public-dataset",
+    "status": "complete"
+  },
+  "validation": {
+    "preprocessing": "passed",
+    "json": "passed",
+    "csv": "passed",
+    "tests": "passed-17-of-17",
+    "gitDiffCheck": "passed",
+    "largeFileScan": "passed",
+    "credentialScan": "passed"
+  },
+  "gitHubUpload": {
+    "remote": "origin",
+    "branch": "main",
+    "status": "ready-for-upload"
+  }
+}

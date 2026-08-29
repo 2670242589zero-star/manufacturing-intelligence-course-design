@@ -15,7 +15,7 @@
     "description": "基于 CC0 原始公开数据加工的 10 行教学样例",
     "platform": "GitHub",
     "url": "https://github.com/2670242589zero-star/manufacturing-intelligence-course-design/blob/main/data/process-quality-sample.csv",
-    "status": "ready-for-upload",
+    "status": "published",
     "files": [
       "data/process-quality-sample.csv",
       "data/process-quality-schema.json",
@@ -67,6 +67,8 @@
   "gitHubUpload": {
     "remote": "origin",
     "branch": "main",
-    "status": "ready-for-upload"
+    "status": "uploaded",
+    "contentCommit": "725dc13d3d04c7d9a426d5b4eae1fc74e8992b8f",
+    "verified": true
   }
 }

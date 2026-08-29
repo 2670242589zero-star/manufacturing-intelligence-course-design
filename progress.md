@@ -56,7 +56,7 @@
 - 已补充根 README、`data/README.md`、两份数据卡、数据源登记和 `第三阶段自查.md`。
 - 已更新 `prompt/2026-08-28-stage-03-public-dataset.json`，记录 Codex、GPT-5.6sol、预处理、来源、安全边界、备份和上传状态。
 - 已新增预处理与索引一致性测试，并修复 API 测试失败时未关闭服务句柄的问题。
-- `npm test` 已通过 17/17；最终 Git 检查、本地备份、提交和 GitHub 推送正在执行。
+- `npm test` 已通过 17/17；最终 Git 检查、本地备份、提交和 GitHub 推送已完成。
 ## 2026-08-28：阶段 5.3 收尾检查点
 
 - 已创建 `_backups/step-08-public-dataset/context-checkpoint-2026-08-28`，备份 20 个关键文件，包含 `prompt/`、规划文档、数据说明、预处理脚本和测试。
@@ -74,3 +74,9 @@
 
 - 已创建 `_backups/step-08-public-dataset/final`，备份第三阶段 20 个关键文件；该目录受 `.gitignore` 保护，不上传 GitHub。
 - 最终备份包含公开样例、索引与数据卡、预处理脚本、测试、提示词记录、规划文件和自查文件。
+## 2026-08-28：阶段 5.3 GitHub 发布确认
+
+- 第三阶段主体提交为 `725dc13`，已推送至 `origin/main`。
+- 推送后本地 `HEAD` 与 `origin/main` 均为 `725dc13d3d04c7d9a426d5b4eae1fc74e8992b8f`。
+- GitHub 仓库主页与 `data/process-quality-sample.csv` 页面均返回 HTTP 200，公开样例链接可访问。
+- 已将提示词记录更新为 `published` / `uploaded`，并完成阶段 5.3 与第三阶段自查勾选。

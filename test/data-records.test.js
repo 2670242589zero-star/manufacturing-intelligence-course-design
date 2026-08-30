@@ -49,7 +49,9 @@ test("keeps dataset metadata, schema and prompt records parseable", async () => 
   assert.equal(parsed[3].harness, "Codex");
   assert.equal(parsed[3].model, "GPT-5.6sol");
   assert.equal(parsed[3].sourceDataset.license, "CC0: Public Domain");
-  assert.equal(parsed[4].status, "ready_for_publish");
+  assert.equal(parsed[4].status, "published");
+  assert.equal(parsed[4].publication.status, "uploaded");
+  assert.equal(parsed[4].publication.implementationCommit, "053b3dffea9d69fc036c3c7a03ab0905ed12260b");
   assert.equal(parsed[4].verification.tests, "19/19 passed");
 });
 

@@ -1,0 +1,59 @@
+{
+  "recordId": "2026-08-24-stage-02-platform-scaffold-reconstructed",
+  "recordType": "reconstructed_summary",
+  "reconstructedAt": "2026-08-30",
+  "originalPeriod": "2026-08-24",
+  "stage": "stage-02",
+  "stageSystem": "task_plan implementation stages",
+  "harness": "Codex",
+  "model": "GPT-5.6sol",
+  "integrityNotice": "This file is a retrospective reconstruction from user requests, repository commits and project documents. It is not a verbatim export of the original AI conversation.",
+  "userRequests": [
+    "将图像预处理、缺陷检测模型、质量分析模型、质量决策、数据库和 Dashboard 结构加入系统。",
+    "确认方案后开始实现，并在完成步骤时保留本地备份和 GitHub 版本。"
+  ],
+  "evidence": {
+    "commits": [
+      {
+        "sha": "db1a1b41b1b98717dfff156e9b977000cc9605a4",
+        "subject": "feat: scaffold vision quality platform"
+      }
+    ],
+    "files": [
+      "server.js",
+      "algorithm/vision.js",
+      "public/index.html",
+      "public/app.js",
+      "public/styles.css",
+      "test/quality.test.js",
+      "package.json"
+    ]
+  },
+  "decisions": [
+    "采用轻量 Node.js B/S 架构作为可运行课程 Demo。",
+    "前端负责图片选择、指标展示和 Dashboard，后端负责接口、记录和质量决策。",
+    "在真实模型未接入时使用可解释视觉指标和规则评分维持完整业务链路。"
+  ],
+  "actions": [
+    "创建 Node.js 服务入口和静态前端。",
+    "实现基础视觉质量评分逻辑。",
+    "创建首批质量算法测试和 Git 忽略规则。"
+  ],
+  "verification": {
+    "scaffoldCommitPresent": true,
+    "qualityTestAdded": true,
+    "repositoryEvidenceCheckedAt": "2026-08-30"
+  },
+  "limitations": [
+    "原始阶段 2 对话没有独立导出，无法证明逐字提示词内容。",
+    "现有 Git 历史没有保存该阶段独立备份清单，因此本记录不声称当时已有可核验的阶段备份。"
+  ],
+  "publication": {
+    "repository": "https://github.com/2670242589zero-star/manufacturing-intelligence-course-design",
+    "branch": "main",
+    "status": "uploaded",
+    "uploadedAt": "2026-08-30",
+    "publicationMethod": "GitHub MCP"
+  },
+  "status": "reconstructed"
+}

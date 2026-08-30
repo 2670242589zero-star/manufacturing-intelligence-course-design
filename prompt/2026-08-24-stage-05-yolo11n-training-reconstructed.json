@@ -1,0 +1,91 @@
+{
+  "recordId": "2026-08-24-stage-05-yolo11n-training-reconstructed",
+  "recordType": "reconstructed_summary",
+  "reconstructedAt": "2026-08-30",
+  "originalPeriod": "2026-08-24 to 2026-08-27",
+  "stage": "stage-05",
+  "stageSystem": "task_plan implementation stages",
+  "harness": "Codex",
+  "model": "GPT-5.6sol",
+  "integrityNotice": "This file is a retrospective reconstruction from user requests, repository commits, the training report and local backup references. It is not a verbatim export of the original AI conversation.",
+  "userRequests": [
+    "先实现 YOLO11n 的训练，下载对应数据集、编译模型并使用现有环境开始训练。",
+    "每完成一步都要在本地备份并上传；随后用户要求该训练阶段先不提交。"
+  ],
+  "evidence": {
+    "commits": [
+      {
+        "sha": "00e93c34fa5a40dc0e5edcbf94fbd2767421db39",
+        "subject": "docs: add unique course topic and solution plan"
+      }
+    ],
+    "files": [
+      "training/prepare_neu_det.py",
+      "training/train_yolo11n.py",
+      "training/evaluate_yolo11n.py",
+      "training/export_yolo11n.py",
+      "training/README.md",
+      "docs/yolo11n-training-report.md"
+    ],
+    "localBackupReference": "_backups/step-05-yolo"
+  },
+  "dataset": {
+    "name": "NEU-DET",
+    "images": 1800,
+    "classes": 6,
+    "split": {
+      "train": 1440,
+      "validation": 180,
+      "test": 180
+    },
+    "uploadPolicy": "raw images remain local and are not redistributed in the repository"
+  },
+  "training": {
+    "model": "YOLO11n pretrained transfer learning",
+    "environment": "cv_tutorial, Python 3.10.20, PyTorch 2.5.1 CUDA 12.1, Ultralytics 8.4.91",
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU 8GB",
+    "parameters": {
+      "epochs": 100,
+      "imageSize": 320,
+      "batch": 32,
+      "optimizer": "AdamW",
+      "amp": true,
+      "seed": 42
+    }
+  },
+  "verification": {
+    "validation": {
+      "precision": 0.685,
+      "recall": 0.764,
+      "mAP50": 0.765,
+      "mAP50_95": 0.451
+    },
+    "independentTest": {
+      "precision": 0.676,
+      "recall": 0.692,
+      "mAP50": 0.747,
+      "mAP50_95": 0.402
+    },
+    "onnxExport": "passed",
+    "onnxRuntimeSmokeTest": "passed"
+  },
+  "decisions": [
+    "使用 320x320 输入以匹配 200x200 原图并控制训练成本。",
+    "模型权重、训练输出和原始 NEU-DET 图片只保存在本地。",
+    "测试指标只描述 NEU-DET 数据分布，不宣称达到生产现场精度。"
+  ],
+  "limitations": [
+    "阶段 5 没有保存逐轮提示词和模型回复，本文件只回溯可验证的训练配置和结果。",
+    "crazing 类别表现较弱，后续需要补充样本、检查标注或调整增强策略。"
+  ],
+  "publication": {
+    "repository": "https://github.com/2670242589zero-star/manufacturing-intelligence-course-design",
+    "branch": "main",
+    "status": "uploaded",
+    "uploadedAt": "2026-08-30",
+    "publicationMethod": "GitHub MCP",
+    "weightsUploaded": false,
+    "rawDatasetUploaded": false
+  },
+  "status": "reconstructed"
+}

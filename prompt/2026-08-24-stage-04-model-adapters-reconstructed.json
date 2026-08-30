@@ -1,0 +1,62 @@
+{
+  "recordId": "2026-08-24-stage-04-model-adapters-reconstructed",
+  "recordType": "reconstructed_summary",
+  "reconstructedAt": "2026-08-30",
+  "originalPeriod": "2026-08-24",
+  "stage": "stage-04",
+  "stageSystem": "task_plan implementation stages",
+  "harness": "Codex",
+  "model": "GPT-5.6sol",
+  "integrityNotice": "This file is a retrospective reconstruction from user requests, repository commits and project documents. It is not a verbatim export of the original AI conversation.",
+  "userRequests": [
+    "说明工艺参数分析和视觉检测分别使用什么模型以及如何训练。",
+    "继续实现 OpenCV、YOLO/检测模型和质量分析模块之间的系统集成。"
+  ],
+  "evidence": {
+    "commits": [
+      {
+        "sha": "d0393429f4ba4e16d016bb38534cd63b02c66a2e",
+        "subject": "feat: add model adapters and dataset import workflow"
+      }
+    ],
+    "files": [
+      "algorithm/inference-adapter.js",
+      "docs/model-integration.md",
+      "data/dataset-sources.json",
+      "scripts/import-dataset.js",
+      "public/model-status.js",
+      "test/inference-adapter.test.js",
+      "test/dataset-import.test.js",
+      "test/stage3-api.test.js"
+    ]
+  },
+  "decisions": [
+    "定义远程模型适配器，使 Node 服务可以调用兼容的 OpenCV/YOLO HTTP 服务。",
+    "保留远程失败后的本地可解释降级模式，并在模型状态接口披露降级情况。",
+    "数据导入工具只生成本地清单，不复制或提交原始图片。"
+  ],
+  "actions": [
+    "实现推理适配器和模型状态接口。",
+    "登记候选公开数据源并增加本地数据导入脚本。",
+    "增加远程推理、降级、数据扫描和阶段 API 测试。",
+    "编写模型接入说明和环境变量契约。"
+  ],
+  "verification": {
+    "adapterTestsAdded": true,
+    "datasetImportTestsAdded": true,
+    "fallbackDocumented": true,
+    "repositoryEvidenceCheckedAt": "2026-08-30"
+  },
+  "limitations": [
+    "阶段 4 尚未直接运行已训练 YOLO 权重，真实图片推理链路在阶段 6 完成。",
+    "原始会话未独立保存，因此只保留可由代码、测试和文档支持的结论。"
+  ],
+  "publication": {
+    "repository": "https://github.com/2670242589zero-star/manufacturing-intelligence-course-design",
+    "branch": "main",
+    "status": "uploaded",
+    "uploadedAt": "2026-08-30",
+    "publicationMethod": "GitHub MCP"
+  },
+  "status": "reconstructed"
+}

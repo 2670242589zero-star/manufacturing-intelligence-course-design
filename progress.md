@@ -98,3 +98,19 @@
 - `npm test` 通过 19/19；Node、前端 JavaScript 和 Python 语法检查通过；`git diff --check` 通过。
 - 已用 `crazing_271.jpg` 完成 Node 到 Python YOLO11n 的真实端到端联调：HTTP 201、质量分 39、中风险、2 个裂纹候选。
 - 原始图片、模型权重、训练输出、Ultralytics 配置、测试日志和本地备份均未纳入公开提交。
+
+## 2026-08-30：阶段 1-5 Prompt 追溯补齐
+
+- 核对 `prompt/` 后确认阶段 1、2、4、5 缺少独立 JSON，阶段 3 的早期实施记录也仅存在于后续汇总中。
+- 新增阶段 1-5 各自独立的 `reconstructed_summary`，依据用户要求、Git 提交、代码、测试、训练报告和本地备份线索重建。
+- 每份记录明确声明不是逐字聊天导出，并列出证据、无法恢复的内容和阶段编号体系，避免把事后概括冒充原始会话。
+- 更新 `prompt/README.md` 和自动化测试，使五份早期记录的阶段编号、重建类型、证据与限制字段可自动检查。
+
+## 2026-08-30：阶段 1-5 Prompt 远端验收
+
+- `npm test` 通过 19/19；8 个既有 prompt JSON 全部解析成功；凭据扫描与 `git diff --check` 通过。
+- 一次 PowerShell JSON 汇总命令因空管道语法失败，随后改用 Node.js 逐文件解析完成替代验证，文件内容未受影响。
+- 三次直接从 PowerShell 调用 `apply_patch` 因参数编码或换行失败，随后通过 Node.js 以 UTF-8 参数调用同一补丁工具完成编辑，文件内容未受影响。
+- 通过 GitHub MCP 将五份阶段 1-5 独立重建记录、目录说明、三份既有阶段记录和自动化测试上传到 `main`。
+- GitHub 提交为 `af8d5198c83ca9f2479c6917ef3ecd7e4e13cd4c`；已逐文件读取阶段 1-5 记录，确认远端存在且内容包含 `reconstructed_summary`、证据和限制声明。
+- 新增 `prompt/2026-08-30-prompt-history-backfill.json`，记录本次修正过程，避免修复 Prompt 追溯问题的过程本身再次缺少记录。

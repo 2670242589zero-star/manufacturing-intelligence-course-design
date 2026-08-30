@@ -1,0 +1,40 @@
+{
+  "recordId": "2026-08-30-prompt-history-backfill",
+  "recordType": "original_summary",
+  "date": "2026-08-30",
+  "stage": "prompt-history-correction",
+  "harness": "Codex",
+  "model": "GPT-5.6sol",
+  "userRequest": "解决阶段 1-5 缺少独立 prompt 记录的问题，完成本地备份、自动化验证并上传 GitHub。",
+  "integrityDecision": {
+    "approach": "为阶段 1-5 分别建立回溯重建摘要，不伪造原始逐字对话。",
+    "recordType": "reconstructed_summary",
+    "evidenceSources": ["用户历史要求", "Git 提交记录", "项目代码与测试", "训练报告", "本地备份引用"]
+  },
+  "actions": [
+    "创建阶段 1-5 五份独立 JSON 记录。",
+    "为每份记录补充 integrityNotice、evidence、limitations 和阶段编号体系。",
+    "将既有阶段记录标记为 original_summary，更新 prompt/README.md 的完整性说明。",
+    "增加自动化测试，检查五份重建记录的阶段、证据、限制和发布状态。",
+    "通过 GitHub MCP 上传 main，并逐文件读取阶段 1-5 记录进行远端验收。"
+  ],
+  "validation": {
+    "tests": "19/19 passed",
+    "promptJsonParsed": 9,
+    "credentialScan": "passed",
+    "gitDiffCheck": "passed",
+    "remoteCommit": "af8d5198c83ca9f2479c6917ef3ecd7e4e13cd4c",
+    "remoteFilesVerified": 5
+  },
+  "limitations": [
+    "阶段 1-5 的原始逐轮聊天没有在当时独立导出，因此本次只能提供有证据支持的回溯摘要。",
+    "重建摘要不能替代原始聊天转储，后续阶段必须在阶段进行时保存 original_summary。"
+  ],
+  "publication": {
+    "repository": "https://github.com/2670242589zero-star/manufacturing-intelligence-course-design",
+    "branch": "main",
+    "method": "GitHub MCP",
+    "status": "uploaded",
+    "uploadedAt": "2026-08-30"
+  }
+}

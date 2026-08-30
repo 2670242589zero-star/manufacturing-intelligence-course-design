@@ -1,4 +1,4 @@
-const state = { inspections: [], latest: null, imageMetrics: null, imageName: "" };
+const state = { inspections: [], latest: null, imageMetrics: null, imageName: "", imageData: "", imageDataPromise: Promise.resolve("") };
 const $ = (selector) => document.querySelector(selector);
 const formatTime = (value) => new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
@@ -61,6 +61,7 @@ function renderLatest(result) {
       '</strong><span>' + Math.round(item.confidence * 100) + '% / ' + item.area + ' px²</span></div>').join("")
     : '<p class="empty-line">未发现明显缺陷候选</p>';
   renderContributors($("#resultContributors"), result.contributors);
+  drawDetections(result);
 }
 
 function drawDetections(result) {
@@ -119,11 +120,22 @@ function calculateMetrics(image, canvas) {
 async function onImageChange(event) {
   const file = event.target.files[0];
   if (!file) return;
+  if (file.size > 6 * 1024 * 1024) {
+    setStatus("图像文件不能超过 6 MB。", "error");
+    event.target.value = "";
+    return;
+  }
   const image = new Image();
   image.onload = () => {
     const metrics = calculateMetrics(image, $("#previewCanvas"));
     state.imageMetrics = metrics;
     state.imageName = file.name;
+    state.imageDataPromise = new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => { state.imageData = String(reader.result || ""); resolve(state.imageData); };
+      reader.onerror = () => reject(new Error("图像读取失败"));
+      reader.readAsDataURL(file);
+    });
     $("#previewCanvas").classList.add("has-image");
     $("#imageEmpty").style.display = "none";
     $("#imageState").textContent = "已读取 · " + file.name;
@@ -147,6 +159,7 @@ async function runInspection(event) {
     pressure: Number($("#pressure").value),
     speed: Number($("#speed").value)
   };
+  const imageData = await state.imageDataPromise;
   const response = await fetch("/api/inspect", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -154,6 +167,7 @@ async function runInspection(event) {
       batchId: $("#batchId").value.trim(),
       line: $("#line").value,
       imageName: state.imageName || "browser-canvas",
+      imageData: imageData || null,
       imageMetrics: state.imageMetrics || { brightness: 58, contrast: 28, edgeDensity: 0.18, sharpness: 72 },
       process
     })

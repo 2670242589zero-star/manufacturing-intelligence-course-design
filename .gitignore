@@ -11,3 +11,6 @@ _backups/
 制造智能技术课程设计任务书.pdf
 _pdf_pages/
 __pycache__/
+.ultralytics/
+yolo-stage6.*.log
+.yolo-stage6.pid

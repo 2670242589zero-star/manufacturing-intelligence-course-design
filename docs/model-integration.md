@@ -19,13 +19,14 @@ npm start
 
 ```json
 {
+  "imageData": "data:image/png;base64,...",
   "imageMetrics": { "brightness": 58, "contrast": 22, "edgeDensity": 0.1, "sharpness": 84 },
   "process": { "temperature": 68, "pressure": 3.8, "speed": 42 },
   "context": { "batchId": "B-001", "line": "压延线 A", "imageName": "sample.png" }
 }
 ```
 
-输出至少包含 `qualityScore` 和 `risk`，推荐同时返回 `detections`、`contributors`、`summary`、`method` 和 `analyzedAt`。OpenCV 负责预处理时，可在该服务中完成灰度化、去噪和边缘增强；YOLO 负责输出缺陷类别、置信度、面积与检测框；质量分析模型将视觉结果与工艺参数融合。
+输出至少包含 `qualityScore` 和 `risk`，推荐同时返回 `detections`、`contributors`、`summary`、`method` 和 `analyzedAt`。本项目的本地实现位于 `inference/yolo_service.py`，启动方式和响应示例见 [`inference/README.md`](../inference/README.md)。OpenCV 负责预处理时，可在该服务中完成灰度化、去噪和边缘增强；YOLO 负责输出缺陷类别、置信度、面积与检测框；质量分析模型将视觉结果与工艺参数融合。
 
 ## 降级与披露
 

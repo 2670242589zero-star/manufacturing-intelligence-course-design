@@ -22,7 +22,7 @@ test("keeps the stage 3 public process sample structurally valid", async () => {
 test("keeps the preprocessing index aligned with the committed sample", async () => {
   const sample = await fsp.readFile(path.join(projectRoot, "data", "process-quality-sample.csv"), "utf8");
   const index = JSON.parse(await fsp.readFile(path.join(projectRoot, "data", "process-quality-index.json"), "utf8"));
-  const digest = crypto.createHash("sha256").update(sample).digest("hex");
+  const digest = crypto.createHash("sha256").update(sample.replaceAll("\r\n", "\n")).digest("hex");
   assert.equal(index.source.sha256, "35fd3bea70843d59f14845a415ab7567744b4dbf75e6b9b64a9ad8a6293ca9cf");
   assert.deepEqual(index.source.selectedRows, [1, 2, 3, 4, 188, 189, 190, 191, 192, 193]);
   assert.equal(index.output.sha256, digest);
@@ -35,7 +35,8 @@ test("keeps dataset metadata, schema and prompt records parseable", async () => 
     path.join(projectRoot, "data", "dataset-sources.json"),
     path.join(projectRoot, "data", "process-quality-schema.json"),
     path.join(projectRoot, "prompt", "2026-08-26-stage-03-data-and-prompt.json"),
-    path.join(projectRoot, "prompt", "2026-08-28-stage-03-public-dataset.json")
+    path.join(projectRoot, "prompt", "2026-08-28-stage-03-public-dataset.json"),
+    path.join(projectRoot, "prompt", "2026-08-29-stage-06-yolo-inference.json")
   ];
   const parsed = [];
   for (const file of files) {
@@ -48,6 +49,8 @@ test("keeps dataset metadata, schema and prompt records parseable", async () => 
   assert.equal(parsed[3].harness, "Codex");
   assert.equal(parsed[3].model, "GPT-5.6sol");
   assert.equal(parsed[3].sourceDataset.license, "CC0: Public Domain");
+  assert.equal(parsed[4].status, "ready_for_publish");
+  assert.equal(parsed[4].verification.tests, "19/19 passed");
 });
 
 test("documents public dataset citations and publication target", async () => {

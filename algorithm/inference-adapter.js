@@ -24,7 +24,7 @@ function createInferenceAdapter(options = {}) {
     return { ...result, method: result.method || "OpenCV + YOLO HTTP adapter" };
   }
 
-  async function analyze(imageMetrics = {}, process = {}, context = {}) {
+  async function analyze(imageMetrics = {}, process = {}, context = {}, imageData = "") {
     const requestedAt = new Date().toISOString();
     if (!endpoint) {
       const result = analyzeVision(imageMetrics, process);
@@ -33,7 +33,9 @@ function createInferenceAdapter(options = {}) {
       return result;
     }
     try {
-      const result = await requestRemote({ imageMetrics, process, context });
+      const payload = { imageMetrics, process, context };
+      if (imageData) payload.imageData = imageData;
+      const result = await requestRemote(payload);
       lastRequest = { requestedAt, completedAt: new Date().toISOString(), mode: "remote", degraded: false };
       lastError = null;
       return result;

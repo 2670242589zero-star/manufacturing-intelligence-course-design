@@ -60,7 +60,7 @@ async function bodyOf(req) {
   let raw = "";
   for await (const chunk of req) {
     raw += chunk;
-    if (raw.length > 1024 * 1024) throw new Error("request_too_large");
+    if (raw.length > 8 * 1024 * 1024) throw new Error("request_too_large");
   }
   return raw ? JSON.parse(raw) : {};
 }
@@ -70,6 +70,10 @@ function validateInspection(payload) {
   if (payload.batchId && String(payload.batchId).length > 80) throw new Error("invalid_batch_id");
   for (const key of ["temperature", "pressure", "speed"]) {
     if (payload.process?.[key] !== undefined && !Number.isFinite(Number(payload.process[key]))) throw new Error("invalid_process_value");
+  }
+  if (payload.imageData !== undefined && payload.imageData !== null) {
+    if (typeof payload.imageData !== "string" || payload.imageData.length > 7 * 1024 * 1024) throw new Error("invalid_image_data");
+    if (payload.imageData && !/^data:image\/(png|jpeg|jpg|webp);base64,[A-Za-z0-9+/=]+$/i.test(payload.imageData)) throw new Error("invalid_image_data");
   }
 }
 
@@ -103,7 +107,7 @@ function createServer(options = {}) {
       if (req.method === "POST" && req.url === "/api/inspect") {
         const payload = await bodyOf(req);
         validateInspection(payload);
-        const result = await inference.analyze(payload.imageMetrics, payload.process, { batchId: payload.batchId, line: payload.line, imageName: payload.imageName });
+        const result = await inference.analyze(payload.imageMetrics, payload.process, { batchId: payload.batchId, line: payload.line, imageName: payload.imageName }, payload.imageData);
         const record = { id: "INSP-" + Date.now(), batchId: payload.batchId || "UNASSIGNED", line: payload.line || "未指定产线", imageName: payload.imageName || "browser-canvas", ...result };
         const items = await readInspections();
         await writeInspections([record, ...items]);

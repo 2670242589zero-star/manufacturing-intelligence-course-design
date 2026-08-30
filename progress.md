@@ -80,3 +80,21 @@
 - 推送后本地 `HEAD` 与 `origin/main` 均为 `725dc13d3d04c7d9a426d5b4eae1fc74e8992b8f`。
 - GitHub 仓库主页与 `data/process-quality-sample.csv` 页面均返回 HTTP 200，公开样例链接可访问。
 - 已将提示词记录更新为 `published` / `uploaded`，并完成阶段 5.3 与第三阶段自查勾选。
+
+## 2026-08-29：阶段 6 启动
+
+- 已确认阶段 6 目标为将浏览器原图接入本地 YOLO11n 推理链路，并保留无模型服务时的可解释规则降级模式。
+- 已创建 _backups/step-09-yolo-inference/context-start-2026-08-29 起始检查点，备份当前服务端、算法适配器、前端、测试和规划文件。
+- 计划新增本地 Python/Ultralytics /infer 服务，Node /api/inspect 通过 JSON imageData 转发原图，前端根据返回检测框绘制结果。
+- 模型权重、原始 NEU-DET 数据和运行输出继续保留在 .gitignore 路径，不上传 GitHub。
+
+## 2026-08-30：阶段 6 完成
+
+- 已创建 `inference/yolo_service.py` 和启动文档，使用 OpenCV 解码图片并调用已训练的 YOLO11n 权重。
+- 已扩展前端、Node `/api/inspect` 和推理适配器，使浏览器原图能够以受限 Base64 data URL 传递到本地模型服务。
+- 已增加图片格式与大小校验、真实检测框绘制，并保留远程失败后的可解释规则降级模式。
+- 已将 Ultralytics 配置目录默认重定向到项目内 `.ultralytics/`，解决受限环境无法读取用户配置目录的问题；该目录不上传 GitHub。
+- 已增加 `/api/inspect` 图片转发与非法图片数据测试，并修复 Windows CRLF 检出时公开样例哈希测试不一致的问题。
+- `npm test` 通过 19/19；Node、前端 JavaScript 和 Python 语法检查通过；`git diff --check` 通过。
+- 已用 `crazing_271.jpg` 完成 Node 到 Python YOLO11n 的真实端到端联调：HTTP 201、质量分 39、中风险、2 个裂纹候选。
+- 原始图片、模型权重、训练输出、Ultralytics 配置、测试日志和本地备份均未纳入公开提交。

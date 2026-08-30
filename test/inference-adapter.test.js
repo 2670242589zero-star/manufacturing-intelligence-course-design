@@ -16,6 +16,7 @@ test("calls a compatible OpenCV and YOLO HTTP service", async () => {
     let raw = "";
     for await (const chunk of req) raw += chunk;
     const payload = JSON.parse(raw);
+    assert.equal(payload.imageData, "data:image/png;base64,abc");
     res.writeHead(200, { "content-type": "application/json" });
     res.end(JSON.stringify({
       qualityScore: 74,
@@ -28,7 +29,7 @@ test("calls a compatible OpenCV and YOLO HTTP service", async () => {
   });
   await new Promise((resolve) => remote.listen(0, resolve));
   const adapter = createInferenceAdapter({ endpoint: "http://127.0.0.1:" + remote.address().port });
-  const result = await adapter.analyze({}, {}, { batchId: "REMOTE-TEST" });
+  const result = await adapter.analyze({}, {}, { batchId: "REMOTE-TEST" }, "data:image/png;base64,abc");
   assert.equal(result.method, "OpenCV + YOLO HTTP adapter");
   assert.equal(result.detections[0].type, "划痕");
   assert.equal(adapter.status().lastRequest.mode, "remote");

@@ -50,3 +50,73 @@ test("persists a valid inspection and rejects invalid process values", async () 
   assert.equal(invalid.status, 400);
   await writeInspections(before);
 });
+test("forwards image data to the configured inference adapter", async () => {
+  const before = await readInspections();
+  let captured;
+  const adapter = {
+    analyze: async (...args) => {
+      captured = args;
+      return {
+        qualityScore: 72,
+        risk: { level: "medium", label: "中风险", tone: "warning" },
+        detections: [{ type: "划痕", confidence: 0.9, area: 20 }],
+        contributors: [],
+        summary: "测试推理结果",
+        method: "test-inference",
+        analyzedAt: new Date().toISOString()
+      };
+    },
+    status: () => ({ configuredMode: "remote" })
+  };
+  const injectedServer = createServer({ inferenceAdapter: adapter });
+  await new Promise((resolve) => injectedServer.listen(0, resolve));
+  try {
+    const response = await fetch("http://127.0.0.1:" + injectedServer.address().port + "/api/inspect", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        batchId: "IMAGE-FORWARD-TEST",
+        line: "压延线 A",
+        imageName: "sample.png",
+        imageData: "data:image/png;base64,abc",
+        imageMetrics: { brightness: 58 },
+        process: { temperature: 68, pressure: 3.8, speed: 42 }
+      })
+    });
+    const body = await response.json();
+    assert.equal(response.status, 201);
+    assert.equal(captured[3], "data:image/png;base64,abc");
+    assert.equal(body.method, "test-inference");
+  } finally {
+    await new Promise((resolve, reject) => injectedServer.close((error) => error ? reject(error) : resolve()));
+    await writeInspections(before);
+  }
+});
+
+test("rejects unsupported image data before inference", async () => {
+  const before = await readInspections();
+  let called = false;
+  const adapter = {
+    analyze: async () => {
+      called = true;
+      throw new Error("should_not_run");
+    },
+    status: () => ({ configuredMode: "remote" })
+  };
+  const injectedServer = createServer({ inferenceAdapter: adapter });
+  await new Promise((resolve) => injectedServer.listen(0, resolve));
+  try {
+    const response = await fetch("http://127.0.0.1:" + injectedServer.address().port + "/api/inspect", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ imageData: "data:text/plain;base64,abc" })
+    });
+    const body = await response.json();
+    assert.equal(response.status, 400);
+    assert.equal(body.error, "invalid_image_data");
+    assert.equal(called, false);
+  } finally {
+    await new Promise((resolve, reject) => injectedServer.close((error) => error ? reject(error) : resolve()));
+    await writeInspections(before);
+  }
+});

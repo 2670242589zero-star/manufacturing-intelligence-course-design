@@ -24,7 +24,7 @@ npm start
                  JSON 数据库 + 可视化 Dashboard
 ```
 
-当前 Demo 使用浏览器 Canvas 指标和可解释规则评分，接口已经按后续接入 OpenCV、YOLO11n、工艺参数模型和 GPT-5.6sol 辅助摘要预留边界。系统输出是“异常证据与处置候选辅助分析”，不宣称自动确定因果关系。
+当前 Demo 默认使用浏览器 Canvas 指标和可解释规则评分；阶段 6 新增 `inference/yolo_service.py`，配置本地服务后可将真实图片交给已训练的 YOLO11n 推理。工艺参数模型和 GPT-5.6sol 辅助摘要仍保留接口边界。系统输出是“异常证据与处置候选辅助分析”，不宣称自动确定因果关系。
 
 ## 数据集与引用
 
@@ -44,6 +44,7 @@ npm start
 - `public/`：Dashboard、图像输入和检测历史
 - `server.js`：Node 内置 HTTP 服务与 REST API
 - `algorithm/`：视觉分析算法和模型适配接口
+- `inference/`：本地 YOLO11n 推理服务与启动说明
 - `data/`：公开样例、数据字典、数据卡、数据源元数据和检测记录；完整原始数据保留在被忽略的 `data/local/`
 - `test/`：算法单元测试与 API 集成测试
 - `学习笔记.md`：AI 工具、Harness、模型、Git 原理、调研和过程记录

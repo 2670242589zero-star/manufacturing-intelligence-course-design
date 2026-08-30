@@ -1,0 +1,54 @@
+{
+  "recordId": "2026-08-29-stage-06-yolo-inference",
+  "date": "2026-08-29",
+  "stage": "stage-06",
+  "harness": "Codex",
+  "model": "GPT-5.6sol",
+  "userRequest": "在第三阶段数据工作完成后继续下一步操作，推进课程设计系统实现。",
+  "decision": {
+    "nextStage": "封装 YOLO11n 推理服务并接入平台真实图片链路",
+    "reason": "task_plan.md 中阶段 6 为下一个未完成阶段；阶段 5 已完成 YOLO11n 训练和 ONNX 导出，但平台当前只接收浏览器图像指标。",
+    "datasetDisclosure": "当前样例来自 Kaggle 公开数据，不是自建数据集，未发布到 Hugging Face；本阶段不将其改称为自建数据。"
+  },
+  "plannedChanges": [
+    "新增本地 Python/Ultralytics YOLO11n JSON 推理服务",
+    "扩展 Node 推理适配器和 /api/inspect 以转发 imageData",
+    "前端读取图片 data URL 并展示真实检测框",
+    "增加接口、适配器和服务契约测试",
+    "更新文档、进度和阶段提示词记录"
+  ],
+  "security": {
+    "modelWeightsUploaded": false,
+    "rawDatasetUploaded": false,
+    "credentialsRecorded": false,
+    "backupRequired": true
+  },
+  "completedActions": [
+    "创建本地 Python/Ultralytics YOLO11n 推理服务并增加健康检查",
+    "扩展 Node 推理适配器与 /api/inspect 以转发和校验 imageData",
+    "扩展前端图片读取和检测框绘制",
+    "增加图片转发、非法格式拒绝、远程推理和降级测试",
+    "将 Ultralytics 配置目录重定向到项目内忽略目录",
+    "完成 Node 到 Python YOLO11n 的真实图片端到端联调"
+  ],
+  "verification": {
+    "date": "2026-08-30",
+    "tests": "19/19 passed",
+    "syntaxChecks": ["server.js", "algorithm/inference-adapter.js", "public/app.js", "inference/yolo_service.py"],
+    "endToEnd": {
+      "image": "NEU-DET test image crazing_271.jpg (local only)",
+      "httpStatus": 201,
+      "qualityScore": 39,
+      "risk": "medium",
+      "detectionCount": 2,
+      "firstDetection": "裂纹",
+      "method": "OpenCV preprocessing + YOLO11n local service"
+    }
+  },
+  "publication": {
+    "repository": "https://github.com/2670242589zero-star/manufacturing-intelligence-course-design",
+    "branch": "main",
+    "status": "pending_final_commit"
+  },
+  "status": "ready_for_publish"
+}

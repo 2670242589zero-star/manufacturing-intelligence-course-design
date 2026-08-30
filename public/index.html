@@ -154,7 +154,7 @@
                   <input id="imageInput" name="image" type="file" accept="image/*">
                 </label>
               </div>
-              <p class="helper-text">图像先在浏览器端提取亮度、对比度、边缘密度与清晰度，再提交到质量分析 API。</p>
+              <p class="helper-text">图像先在浏览器端提取基础指标；启用本地 YOLO11n 服务时，原图会通过 Node API 转发到本机推理服务。</p>
               <button class="primary-button" id="runButton" type="submit">运行质量分析</button>
               <p class="form-status" id="formStatus" aria-live="polite"></p>
             </form>

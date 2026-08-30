@@ -37,6 +37,7 @@ test("keeps dataset metadata, schema and prompt records parseable", async () => 
     path.join(projectRoot, "prompt", "2026-08-26-stage-03-data-and-prompt.json"),
     path.join(projectRoot, "prompt", "2026-08-28-stage-03-public-dataset.json"),
     path.join(projectRoot, "prompt", "2026-08-29-stage-06-yolo-inference.json"),
+    path.join(projectRoot, "prompt", "2026-08-30-prompt-history-backfill.json"),
     path.join(projectRoot, "prompt", "2026-08-24-stage-01-planning-reconstructed.json"),
     path.join(projectRoot, "prompt", "2026-08-24-stage-02-platform-scaffold-reconstructed.json"),
     path.join(projectRoot, "prompt", "2026-08-24-stage-03-quality-pipeline-reconstructed.json"),
@@ -54,17 +55,20 @@ test("keeps dataset metadata, schema and prompt records parseable", async () => 
   assert.equal(parsed[3].harness, "Codex");
   assert.equal(parsed[3].model, "GPT-5.6sol");
   assert.equal(parsed[3].sourceDataset.license, "CC0: Public Domain");
-  assert.deepEqual(parsed.slice(2, 5).map((record) => record.recordType), ["original_summary", "original_summary", "original_summary"]);
+  assert.deepEqual(parsed.slice(2, 6).map((record) => record.recordType), ["original_summary", "original_summary", "original_summary", "original_summary"]);
   assert.equal(parsed[4].status, "published");
   assert.equal(parsed[4].publication.status, "uploaded");
   assert.equal(parsed[4].publication.implementationCommit, "053b3dffea9d69fc036c3c7a03ab0905ed12260b");
   assert.equal(parsed[4].verification.tests, "19/19 passed");
-  const reconstructed = parsed.slice(5);
+  assert.equal(parsed[5].stage, "prompt-history-correction");
+  assert.equal(parsed[5].validation.remoteFilesVerified, 5);
+  const reconstructed = parsed.slice(6);
   assert.deepEqual(reconstructed.map((record) => record.stage), ["stage-01", "stage-02", "stage-03", "stage-04", "stage-05"]);
   for (const record of reconstructed) {
     assert.equal(record.recordType, "reconstructed_summary");
     assert.equal(record.stageSystem, "task_plan implementation stages");
-    assert.equal(record.publication.status, "pending_upload");
+    assert.equal(record.publication.status, "uploaded");
+    assert.equal(record.publication.publicationMethod, "GitHub MCP");
     assert.ok(record.integrityNotice.includes("not a verbatim export"));
     assert.ok(record.evidence.commits.length >= 1);
     assert.ok(record.limitations.length >= 1);

@@ -81,7 +81,9 @@
   "publication": {
     "repository": "https://github.com/2670242589zero-star/manufacturing-intelligence-course-design",
     "branch": "main",
-    "status": "pending_upload",
+    "status": "uploaded",
+    "uploadedAt": "2026-08-30",
+    "publicationMethod": "GitHub MCP",
     "weightsUploaded": false,
     "rawDatasetUploaded": false
   },

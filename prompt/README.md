@@ -54,3 +54,4 @@ YYYY-MM-DD-stage-NN-topic.json
 - `2026-08-26-stage-03-data-and-prompt.json`：第三阶段数据目录、样例、Schema 和 AI 交流记录初始化。
 - `2026-08-28-stage-03-public-dataset.json`：公开来源引用、GitHub 加工样例发布、预处理、安全检查与同步记录。
 - `2026-08-29-stage-06-yolo-inference.json`：阶段 6 YOLO11n 本地推理服务和真实图片链路记录。
+- `2026-08-30-prompt-history-backfill.json`：阶段 1-5 独立记录补齐、完整性决策、测试和 GitHub 验收记录。

@@ -1,0 +1,70 @@
+{
+  "recordId": "2026-09-01-stage-06-2-knowledge-fusion",
+  "recordType": "execution_log",
+  "date": "2026-09-01",
+  "stage": "stage-06.2",
+  "stageSystem": "task_plan implementation stages",
+  "harness": "Codex + GitHub",
+  "model": "GPT-5.6sol",
+  "userRequest": "进行 6.2 知识库、证据融合与处置推荐接口，并继续完善项目。",
+  "startingState": {
+    "repositoryHead": "7391559279c3a9389d9cb5df2e415d85ae81d824",
+    "localChanges": "阶段 6.1 工艺参数模型训练、适配器、Dashboard 和文档存在未提交修改",
+    "previousCommitPolicy": "用户此前明确要求先不提交、不推送"
+  },
+  "implementation": {
+    "knowledgeFile": "knowledge/entries.json",
+    "knowledgeEntries": 6,
+    "knowledgeAdapter": "algorithm/knowledge-base.js",
+    "evidenceFusion": "algorithm/evidence-fusion.js",
+    "recommendationBuilder": "algorithm/recommendation.js",
+    "nodeRoutes": [
+      "GET /api/knowledge",
+      "POST /api/recommendations"
+    ],
+    "frontend": [
+      "视觉结果页显示融合风险、置信度、证据来源和推荐动作",
+      "视觉分析完成后自动请求推荐",
+      "工艺预测完成后重新融合最新结果",
+      "支持手动重新生成建议"
+    ]
+  },
+  "decisionPolicy": {
+    "sources": ["vision", "process", "history"],
+    "riskMapping": "固定演示权重与 0~1 证据值映射为 low/medium/high",
+    "humanReview": "中高风险、无证据、来源不一致或存在范围告警时要求人工复核",
+    "safetyBoundary": "推荐是候选动作，不自动确定根因，不自动控制设备，所有推荐 humanApprovalRequired=true",
+    "noMatch": "knowledge fallback=true，并返回人工判断提示"
+  },
+  "verification": {
+    "nodeTests": "28/28 passed",
+    "javascriptSyntax": "passed",
+    "gitDiffCheck": "passed",
+    "knowledgeLoad": "6 entries loaded",
+    "unknownQuery": "0 matches with safe fallback",
+    "httpSmoke": "high-risk multi-source recommendation returned with evidence and actions",
+    "browserVisualAutomation": "not re-run; prior local sandbox helper error remains documented"
+  },
+  "artifacts": [
+    "knowledge/entries.json",
+    "algorithm/knowledge-base.js",
+    "algorithm/evidence-fusion.js",
+    "algorithm/recommendation.js",
+    "docs/knowledge-fusion.md",
+    "阶段6.2自查.md",
+    "test/knowledge-fusion.test.js"
+  ],
+  "backup": {
+    "baseline": "_backups/step-14-knowledge-fusion/baseline",
+    "core": "_backups/step-14-knowledge-fusion/core",
+    "final": "_backups/step-14-knowledge-fusion/final",
+    "finalFileCount": 31,
+    "finalSha256Verified": true
+  },
+  "publication": {
+    "committed": false,
+    "pushed": false,
+    "reason": "用户于 2026-09-02 明确授权收尾、提交并推送；等待本次提交完成"
+  },
+  "status": "complete_local_pending_publication"
+}

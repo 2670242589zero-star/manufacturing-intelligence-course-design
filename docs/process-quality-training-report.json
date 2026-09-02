@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "modelId": "process-quality-random-forest-v1",
+  "source": {
+    "name": "Quality Prediction in a Mining Process",
+    "url": "https://www.kaggle.com/datasets/edumagalhaes/quality-prediction-in-a-mining-process",
+    "license": "CC0: Public Domain",
+    "localFile": "data/local/mining-quality-source/full-20260830/MiningProcess_Flotation_Plant_Database.csv",
+    "sha256": "ae0231a0bd2e14aac39cf978d81db6c71907a42aade19327816692c4e30cb956"
+  },
+  "preprocessing": {
+    "aggregation": "hourly mean after parsing locale decimal commas",
+    "audit": {
+      "rawRows": 737453,
+      "rawColumns": 24,
+      "rawMissingCellsAfterParsing": 0,
+      "duplicateRawTimestamps": 733356,
+      "hourlyRows": 4097,
+      "timestampMin": "2017-03-10T01:00:00",
+      "timestampMax": "2017-09-09T23:00:00",
+      "targetUniqueRaw": 55569,
+      "targetUniqueHourly": 722,
+      "ironConcentrateTargetCorrelation": -0.8012080236391859
+    },
+    "hourlyOutput": "data/local/mining-quality-source/processed/process-quality-hourly.csv",
+    "features": [
+      "iron_feed_pct",
+      "silica_feed_pct",
+      "starch_flow",
+      "amina_flow",
+      "ore_pulp_flow",
+      "ore_pulp_ph",
+      "ore_pulp_density",
+      "flotation_air_flow_avg",
+      "flotation_level_avg"
+    ],
+    "target": "silica_concentrate_pct",
+    "excludedLeakageFields": [
+      "iron_concentrate_pct"
+    ]
+  },
+  "split": {
+    "strategy": "chronological 70/15/15 without shuffling",
+    "train": {
+      "rows": 2867,
+      "from": "2017-03-10T01:00:00",
+      "to": "2017-07-20T17:00:00"
+    },
+    "validation": {
+      "rows": 615,
+      "from": "2017-07-20T18:00:00",
+      "to": "2017-08-15T08:00:00"
+    },
+    "test": {
+      "rows": 615,
+      "from": "2017-08-15T09:00:00",
+      "to": "2017-09-09T23:00:00"
+    }
+  },
+  "selection": {
+    "metric": "validation MAE",
+    "candidates": [
+      {
+        "parameters": {
+          "n_estimators": 200,
+          "max_depth": 12,
+          "min_samples_leaf": 4
+        },
+        "validation": {
+          "mae": 0.7723139471638076,
+          "rmse": 1.0444301155358189,
+          "r2": -0.018068134587348572
+        }
+      },
+      {
+        "parameters": {
+          "n_estimators": 300,
+          "max_depth": 18,
+          "min_samples_leaf": 2
+        },
+        "validation": {
+          "mae": 0.797454480235732,
+          "rmse": 1.0605013600652318,
+          "r2": -0.04964038536484017
+        }
+      },
+      {
+        "parameters": {
+          "n_estimators": 300,
+          "max_depth": null,
+          "min_samples_leaf": 2
+        },
+        "validation": {
+          "mae": 0.7942252548779983,
+          "rmse": 1.056844279702046,
+          "r2": -0.042413613664567196
+        }
+      }
+    ],
+    "selected": {
+      "parameters": {
+        "n_estimators": 200,
+        "max_depth": 12,
+        "min_samples_leaf": 4
+      },
+      "validation": {
+        "mae": 0.7723139471638076,
+        "rmse": 1.0444301155358189,
+        "r2": -0.018068134587348572
+      }
+    }
+  },
+  "evaluation": {
+    "test": {
+      "mae": 0.8719386809358487,
+      "rmse": 1.1165252204455243,
+      "r2": 0.13100269828807254
+    },
+    "medianBaseline": {
+      "value": 2.0,
+      "mae": 0.9710975609756098,
+      "rmse": 1.2716567992010412,
+      "r2": -0.1272524509375934
+    },
+    "maeImprovementOverBaselinePct": 10.211011130554331
+  },
+  "featureImportance": [
+    {
+      "feature": "flotation_air_flow_avg",
+      "importance": 0.18652288291410424
+    },
+    {
+      "feature": "amina_flow",
+      "importance": 0.15623774901440773
+    },
+    {
+      "feature": "flotation_level_avg",
+      "importance": 0.13415617662451151
+    },
+    {
+      "feature": "silica_feed_pct",
+      "importance": 0.10529551552415858
+    },
+    {
+      "feature": "ore_pulp_density",
+      "importance": 0.09113508591523946
+    },
+    {
+      "feature": "starch_flow",
+      "importance": 0.08887507474544643
+    },
+    {
+      "feature": "ore_pulp_ph",
+      "importance": 0.08636705347622824
+    },
+    {
+      "feature": "iron_feed_pct",
+      "importance": 0.07979503737646973
+    },
+    {
+      "feature": "ore_pulp_flow",
+      "importance": 0.07161542440943414
+    }
+  ],
+  "targetQuantiles": {
+    "q50": 2.0,
+    "q80": 3.2451780821911145,
+    "q95": 4.729499999999999
+  },
+  "artifacts": {
+    "joblib": {
+      "file": "models/process-quality-rf/model.joblib",
+      "sha256": "8d7360ed40ccf4648b5c2fc7ecd74ad56a9817010690b1500ba5e7ab589c67d7",
+      "uploaded": false
+    },
+    "manifest": {
+      "file": "models/process-quality-rf/manifest.json",
+      "uploaded": false
+    },
+    "onnx": {
+      "status": "exported",
+      "file": "models/process-quality-rf/model.onnx",
+      "sha256": "85ef74ff25fd9089cbe9ba176d404cf0d3264f823ed59f38faaf04fd4c5caccd",
+      "validationRows": 64,
+      "maxAbsoluteDifference": 9.234544826597357e-07,
+      "opset": 17,
+      "uploaded": false
+    }
+  },
+  "runtime": {
+    "python": "3.10.20",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "pandas": "2.3.3",
+    "scikitLearn": "1.7.2",
+    "joblib": "1.5.3",
+    "numpy": "2.2.5"
+  },
+  "limitations": [
+    "Metrics describe the public dataset time range and are not production-site accuracy claims.",
+    "Feature importance represents predictive association, not confirmed process causality.",
+    "Risk thresholds in the inference service are relative to training-target quantiles and require domain validation."
+  ]
+}

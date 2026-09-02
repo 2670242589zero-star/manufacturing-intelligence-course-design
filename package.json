@@ -7,6 +7,8 @@
     "start": "node server.js",
     "test": "node --test \"test/*.test.js\"",
     "dataset:import": "node scripts/import-dataset.js",
-    "dataset:preprocess": "node scripts/preprocess-process-quality.js"
+    "dataset:preprocess": "node scripts/preprocess-process-quality.js",
+    "process:train": "python training/train_process_quality.py",
+    "process:serve": "python inference/process_quality_service.py"
   }
 }

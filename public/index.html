@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="制造智能视觉质检与质量异常分析平台">
-  <title>Vision Quality Control</title>
+  <meta name="description" content="制造质量视觉检测与工艺参数智能分析平台">
+  <title>Manufacturing Quality Intelligence</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -20,6 +20,7 @@
       <nav class="side-nav" aria-label="主导航">
         <button class="nav-item active" data-target="overview"><span class="nav-dot"></span>质量总览</button>
         <button class="nav-item" data-target="inspect"><span class="nav-dot"></span>视觉质检</button>
+        <button class="nav-item" data-target="process-quality"><span class="nav-dot"></span>工艺预测</button>
         <button class="nav-item" data-target="history"><span class="nav-dot"></span>检测记录</button>
       </nav>
       <div class="sidebar-note">
@@ -36,7 +37,7 @@
       <header class="topbar">
         <div>
           <p class="eyebrow">制造智能 · 质量工程</p>
-          <h1>视觉质检控制台</h1>
+          <h1>制造质量智能控制台</h1>
         </div>
         <div class="topbar-actions">
           <span class="date-label" id="todayLabel"></span>
@@ -220,6 +221,100 @@
               </div>
             </div>
             <div id="resultContributors" class="contributor-list compact"></div>
+          </article>
+          <article class="panel result-card decision-card">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">知识增强决策</p>
+                <h3>证据融合与处置推荐</h3>
+              </div>
+              <span class="risk-pill" id="decisionRisk">等待分析</span>
+            </div>
+            <p id="decisionSummary" class="panel-caption">提交视觉结果或工艺预测后生成候选建议。</p>
+            <div class="decision-meta">
+              <span>融合置信度 <b id="decisionConfidence">--</b></span>
+              <span>证据来源 <b id="decisionSources">--</b></span>
+            </div>
+            <div class="decision-section">
+              <span class="metric-label">证据清单</span>
+              <div id="decisionEvidence" class="decision-list"><p class="empty-line">暂无证据</p></div>
+            </div>
+            <div class="decision-section">
+              <span class="metric-label">推荐动作</span>
+              <div id="decisionRecommendations" class="decision-list"><p class="empty-line">暂无推荐</p></div>
+            </div>
+            <button class="ghost-button decision-button" id="recommendationButton" type="button">重新生成处置建议</button>
+            <p class="form-status" id="decisionStatus" aria-live="polite"></p>
+          </article>
+        </div>
+      </section>
+
+      <section id="process-quality" class="view-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">工艺参数分析</p>
+            <h2>精矿二氧化硅含量预测</h2>
+          </div>
+          <span class="section-step">02 / 03</span>
+        </div>
+
+        <div class="process-layout">
+          <article class="panel form-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">模型输入</p>
+                <h3>浮选工艺参数</h3>
+              </div>
+              <span class="risk-pill" id="processModelStatus">检查中</span>
+            </div>
+            <form id="processQualityForm">
+              <div class="process-field-grid">
+                <label><span>入料铁品位 / %</span><input data-process-feature="iron_feed_pct" type="number" step="0.001" value="55.2" required></label>
+                <label><span>入料二氧化硅 / %</span><input data-process-feature="silica_feed_pct" type="number" step="0.001" value="16.98" required></label>
+                <label><span>淀粉流量</span><input data-process-feature="starch_flow" type="number" step="0.001" value="3019.53" required></label>
+                <label><span>胺流量</span><input data-process-feature="amina_flow" type="number" step="0.001" value="557.434" required></label>
+                <label><span>矿浆流量</span><input data-process-feature="ore_pulp_flow" type="number" step="0.001" value="395.713" required></label>
+                <label><span>矿浆 pH</span><input data-process-feature="ore_pulp_ph" type="number" step="0.0001" value="10.0664" required></label>
+                <label><span>矿浆密度</span><input data-process-feature="ore_pulp_density" type="number" step="0.0001" value="1.74" required></label>
+                <label><span>浮选柱平均气流</span><input data-process-feature="flotation_air_flow_avg" type="number" step="0.001" value="265.09" required></label>
+                <label><span>浮选柱平均液位</span><input data-process-feature="flotation_level_avg" type="number" step="0.001" value="461.548" required></label>
+              </div>
+              <button class="primary-button" id="processPredictButton" type="submit">运行工艺质量预测</button>
+              <p class="form-status" id="processFormStatus" aria-live="polite"></p>
+            </form>
+          </article>
+
+          <article class="panel process-result-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">模型输出</p>
+                <h3>质量风险预测</h3>
+              </div>
+              <span class="risk-pill" id="processRisk">等待预测</span>
+            </div>
+            <div class="prediction-display">
+              <strong id="processPrediction">--</strong>
+              <span>% SiO₂</span>
+            </div>
+            <p id="processSummary" class="panel-caption">模型结果仅代表公开数据时间外推测试，不作为生产现场精度承诺。</p>
+            <div class="process-evidence">
+              <div>
+                <span class="metric-label">模型测试</span>
+                <strong id="processModelMetric">等待服务状态</strong>
+              </div>
+              <div>
+                <span class="metric-label">输入范围</span>
+                <strong id="processRangeState">等待预测</strong>
+              </div>
+            </div>
+            <div class="process-result-section">
+              <span class="metric-label">全局特征重要性</span>
+              <div id="processImportance" class="contributor-list compact"></div>
+            </div>
+            <div class="process-result-section">
+              <span class="metric-label">范围告警</span>
+              <div id="processWarnings" class="warning-list"><p class="empty-line">暂无预测结果</p></div>
+            </div>
           </article>
         </div>
       </section>

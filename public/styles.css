@@ -69,10 +69,11 @@ h3 { margin-bottom: 0; font-size: 16px; line-height: 1.3; }
 .metric-value { display: block; margin: 18px 0 10px; font-size: 30px; line-height: 1; letter-spacing: -.03em; }
 .metric-status { color: var(--success); font-size: 23px; }
 .metric-foot { color: var(--dim); font-size: 11px; }
-.content-grid, .inspection-layout, .result-grid { display: grid; gap: 12px; }
+.content-grid, .inspection-layout, .result-grid, .process-layout { display: grid; gap: 12px; }
 .content-grid { grid-template-columns: minmax(0, 1.6fr) minmax(300px, .9fr); margin-top: 12px; }
 .inspection-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-.result-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 12px; }
+.process-layout { grid-template-columns: minmax(0, 1.25fr) minmax(360px, .75fr); }
+.result-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 12px; }
 .panel { padding: 22px; }
 .panel-heading { margin-bottom: 24px; }
 .chart-panel, .insight-panel { min-height: 286px; }
@@ -96,6 +97,7 @@ h3 { margin-bottom: 0; font-size: 16px; line-height: 1.3; }
 .compact { gap: 12px; }
 .form-panel { min-height: 375px; }
 .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 12px; }
+.process-field-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 12px; }
 label span { display: block; margin-bottom: 7px; color: var(--muted); font-size: 11px; }
 input, select { width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid #33464a; border-radius: 6px; outline: none; color: var(--text); background: #11191c; }
 input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(243, 163, 74, .12); }
@@ -104,6 +106,16 @@ form .primary-button { margin-top: 22px; width: 100%; }
 .form-status { min-height: 18px; margin: 10px 0 0; color: var(--muted); font-size: 12px; }
 .form-status.error { color: var(--danger); }
 .form-status.success { color: var(--success); }
+.process-result-panel { min-height: 480px; }
+.prediction-display { display: flex; align-items: baseline; gap: 9px; }
+.prediction-display strong { font-size: 56px; line-height: 1; letter-spacing: 0; }
+.prediction-display span { color: var(--muted); font: 13px ui-monospace, SFMono-Regular, Consolas, monospace; }
+.process-evidence { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 20px; }
+.process-evidence > div { min-height: 74px; padding: 12px; border: 1px solid var(--line); border-radius: 6px; background: #131d20; }
+.process-evidence strong { display: block; margin-top: 8px; font-size: 12px; }
+.process-result-section { margin-top: 22px; }
+.process-result-section > .metric-label { display: block; margin-bottom: 10px; }
+.warning-list { display: grid; gap: 8px; }
 .image-panel { min-height: 375px; }
 .image-stage { position: relative; min-height: 248px; display: grid; place-items: center; overflow: hidden; border: 1px dashed #3d5257; border-radius: 6px; background: #101719; }
 #previewCanvas { display: none; width: 100%; height: 248px; object-fit: contain; }
@@ -127,6 +139,23 @@ form .primary-button { margin-top: 22px; width: 100%; }
 .detection-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 12px; border: 1px solid #39484b; border-radius: 6px; background: #1b272b; }
 .detection-item strong { font-size: 12px; }
 .detection-item span { color: var(--warning); font: 11px ui-monospace, SFMono-Regular, Consolas, monospace; }
+.decision-card { grid-column: span 2; }
+.decision-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 18px; }
+.decision-meta span { padding: 10px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); font-size: 11px; }
+.decision-meta b { display: block; margin-top: 4px; color: var(--text); font-size: 12px; }
+.decision-section { margin-top: 18px; }
+.decision-section > .metric-label { display: block; margin-bottom: 9px; }
+.decision-list { display: grid; gap: 8px; }
+.decision-list .detection-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+.decision-list .detection-item small { grid-column: 1 / -1; color: var(--muted); font-size: 10px; }
+.recommendation-item { padding: 11px 12px; border: 1px solid #39484b; border-radius: 6px; background: #1b272b; }
+.recommendation-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.recommendation-top strong { font-size: 12px; }
+.recommendation-top span { color: var(--warning); font: 10px ui-monospace, SFMono-Regular, Consolas, monospace; }
+.recommendation-item p { margin: 7px 0; color: var(--muted); font-size: 11px; }
+.recommendation-item ul { margin: 0; padding-left: 17px; color: var(--text); font-size: 11px; }
+.recommendation-item small { display: block; margin-top: 8px; color: var(--dim); font-size: 10px; }
+.decision-button { width: 100%; margin-top: 18px; }
 .empty-line { margin: 0; color: var(--dim); font-size: 12px; }
 .table-panel { padding: 0; overflow: hidden; }
 .table-wrap { overflow-x: auto; }
@@ -140,7 +169,7 @@ tbody tr:hover td { background: rgba(67, 193, 177, .04); }
   .sidebar { width: 210px; flex-basis: 210px; }
   .metric-grid { grid-template-columns: repeat(2, 1fr); }
   .result-grid { grid-template-columns: 1fr 1fr; }
-  .result-card:last-child { grid-column: span 2; }
+  .result-card:last-child, .decision-card { grid-column: span 2; }
 }
 @media (max-width: 720px) {
   .app-shell { display: block; }
@@ -153,9 +182,11 @@ tbody tr:hover td { background: rgba(67, 193, 177, .04); }
   .topbar { align-items: flex-start; padding-bottom: 24px; }
   .topbar-actions { display: block; text-align: right; }
   .date-label { display: block; margin-bottom: 8px; }
-  .content-grid, .inspection-layout { grid-template-columns: 1fr; }
+  .content-grid, .inspection-layout, .process-layout { grid-template-columns: 1fr; }
   .result-grid { grid-template-columns: 1fr; }
-  .result-card:last-child { grid-column: auto; }
+  .result-card:last-child, .decision-card { grid-column: auto; }
   .field-grid { grid-template-columns: 1fr; }
+  .process-field-grid { grid-template-columns: 1fr; }
+  .process-evidence { grid-template-columns: 1fr; }
   .image-metrics { grid-template-columns: repeat(2, 1fr); }
 }

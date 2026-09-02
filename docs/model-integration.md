@@ -32,6 +32,28 @@ npm start
 
 `VISION_MODEL_FALLBACK=true` 时，远程服务超时或返回格式错误会降级到本地算法。`GET /api/model-status` 会返回 `lastRequest.degraded=true` 和错误摘要，报告与演示必须如实说明实际使用的适配器。
 
+## 工艺质量模型接入
+
+阶段 6.1 新增 RandomForestRegressor 工艺质量回归服务。模型使用 9 个工艺特征预测 `silica_concentrate_pct`，默认排除 `iron_concentrate_pct`，避免把后验质量结果作为可部署输入。
+
+启动 Python 服务后配置 Node：
+
+```powershell
+$env:PROCESS_QUALITY_MODEL_ENDPOINT = "http://127.0.0.1:8010"
+$env:PROCESS_QUALITY_MODEL_TIMEOUT_MS = "5000"
+npm start
+```
+
+平台通过 `GET /api/process-quality/status` 查询模型状态，通过 `POST /api/process-quality/predict` 转发 9 特征请求。模型服务不可用时返回 `503 process_model_unavailable`；与视觉链路不同，工艺预测不做规则假结果降级。
+
+响应包含：
+
+- 预测的精矿二氧化硅百分比和相对风险等级；
+- 超出训练集最小值/最大值的输入告警；
+- RandomForest 全局特征重要性前五项；
+- 模型 ID、推理方法和分析时间。
+
+风险阈值来自训练目标的 `q50/q80/q95` 分位数，只用于课程演示分级。特征重要性表示预测关联，不构成已确认的工艺因果关系。
 ## 数据导入
 
 公开数据源登记在 `data/dataset-sources.json`。下载并确认数据条款后，可执行：

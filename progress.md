@@ -28,6 +28,36 @@
 - 将本地 YOLO11n 权重封装为 `/infer` 模型服务并接入平台真实图片链路。
 - 建立知识库、证据融合和处置推荐接口，补充真实推理截图、性能测试和课程设计报告。
 
+## 2026-09-01：阶段 6.2 知识库、证据融合与处置推荐
+
+- 在 `knowledge/entries.json` 建立 6 条本地可审计规则，包含来源、证据等级、适用边界、检查项、处置项和停止条件。
+- 新增 `algorithm/knowledge-base.js`，支持按关键词、缺陷类型、工艺信号和风险等级检索，并返回匹配理由。
+- 新增 `algorithm/evidence-fusion.js`，融合视觉候选/风险、工艺预测/范围告警和近期历史风险；输出证据来源、权重、强度、融合分数、置信度、来源一致性和人工复核原因。
+- 新增 `algorithm/recommendation.js`，输出知识命中、检查步骤、处置候选、停止条件、证据等级和 `humanApprovalRequired`。
+- Node 新增 `GET /api/knowledge` 和 `POST /api/recommendations`，前端视觉结果页新增证据清单、来源、融合置信度和推荐动作展示。
+- 新增 `docs/knowledge-fusion.md` 和 `阶段6.2自查.md`，同步 README、流水线描述和 API 目录。
+- 新增 4 个阶段 6.2 测试场景，并修正同分知识条目排序不应被测试当作固定契约的问题。
+- 验证：`npm test` 通过 28/28；JavaScript 语法检查通过；`git diff --check` 通过；知识库 6 条，未知查询返回 0 命中且不生成无来源动作。
+- 已建立 `_backups/step-14-knowledge-fusion/baseline`、`core` 和 `final` 本地备份；最终备份包含当前变更文件并完成 SHA-256 一致性核验。
+
+## 当前工作状态（2026-09-02）
+
+- 阶段 6.2 本地实现、测试和备份已完成；用户已明确授权本次收尾提交并推送 GitHub。
+- 本次提交完成后进入阶段 7：需求规格说明书、设计报告、演示视频和答辩材料。
+
+## 2026-08-30：阶段 6.1 工艺参数模型训练恢复
+
+- 从远端已验收提交 `7391559` 恢复阶段 6.1，本地仅保留训练代码、规划记录和 Prompt 的未提交修改；安全分支 `codex/pre-sync-stage6-20260830` 与同步前备份继续保留。
+- 复核 Kaggle 完整压缩包 SHA-256 为 `fa1fb0c928d84366ec1bd315e0ed1380f5d5576525603458b49ea4cfe446d98e`。
+- 复核正式训练 CSV SHA-256 为 `ae0231a0bd2e14aac39cf978d81db6c71907a42aade19327816692c4e30cb956`，共 737453 行、24 列；完整数据继续保留在被 Git 忽略的 `data/local/`。
+- `training/process_quality_common.py` 与 `training/train_process_quality.py` 已通过 Python 3.10.20 `py_compile` 语法检查。
+- 训练继续采用按小时聚合、70%/15%/15% 时间顺序切分、验证集 MAE 选参，并排除 `iron_concentrate_pct` 以降低后验质量字段泄漏风险。
+- 本地沙箱辅助进程曾发生 `helper_unknown_error: setup refresh had errors`；改用经授权的本机执行环境后恢复，项目文件和 Git 状态未受影响。
+- 已安装 `skl2onnx 1.20.0`，完成三组 RandomForestRegressor 候选训练；选中 `n_estimators=200`、`max_depth=12`、`min_samples_leaf=4`。
+- 独立测试集 MAE 为 `0.87194`、RMSE 为 `1.11653`、R² 为 `0.13100`，相对训练+验证中位数基线的 MAE 改善 `10.21%`。
+- 已导出本地 `model.joblib` 与 ONNX opset 17；joblib/ONNX 在独立 128 条样本上的最大绝对差为 `1.47e-6`，结果均为有限数值。
+- 新增 `inference/process_quality_service.py`、`algorithm/process-quality-adapter.js` 和 `/api/process-quality/status`、`/api/process-quality/predict` 路由；模型未配置或不可用时返回 503，不生成伪预测。
+
 ## 2026-08-26：阶段 5.2 数据与交流记录
 
 - 创建 `data/README.md`，明确公开样例、完整原始数据和模型产物的边界。
@@ -115,3 +145,20 @@
 - GitHub 提交为 `af8d5198c83ca9f2479c6917ef3ecd7e4e13cd4c`；已逐文件读取阶段 1-5 记录，确认远端存在且内容包含 `reconstructed_summary`、证据和限制声明。
 - 新增 `prompt/2026-08-30-prompt-history-backfill.json`，记录本次修正过程，避免修复 Prompt 追溯问题的过程本身再次缺少记录。
 - 已创建 `_backups/step-11-prompt-history-backfill/final` 最终本地备份，包含 14 个关键文件和 `manifest.json`；源文件与备份文件 SHA-256 逐项一致。
+## 2026-08-30：阶段 6.1 工艺参数模型收尾验收
+
+- 已完成 Dashboard 工艺预测页面，前端 9 特征与 Node/Python 接口契约一致；状态卡展示模型在线状态、测试 MAE/R²、预测值、风险、范围告警和全局特征重要性。
+- 使用前端默认 9 特征完成 Node `4174` 到 Python `8010` 的端到端预测，返回 `1.989%`、低风险、0 项范围告警；越界样例返回 4 项范围告警，缺失特征返回 HTTP 400。
+- 已补充根 README、`training/README.md`、`inference/README.md`、`docs/model-integration.md`、`docs/process-quality-model-card.md` 和 `阶段6.1自查.md`。
+- 自动化测试 `23/23` 通过；Node/前端 JavaScript 语法检查、Python `py_compile`、10 份 Prompt JSON 解析、训练报告解析、凭据扫描与 `git diff --check` 通过。
+- 大文件扫描发现根目录既有 `yolo11n.pt`、`yolo26n.pt`，已确认由 `.gitignore` 的 `*.pt` 规则排除且未被 Git 跟踪，未删除或修改用户文件。
+- 浏览器视觉自动化再次因 `windows sandbox failed: helper_unknown_error: setup refresh had errors` 无法启动；已完成 HTTP、DOM 字段映射和响应式 CSS 静态验收，限制写入自查和 Prompt，待运行时恢复后补桌面/移动截图。
+- `apply_patch` 也受同一沙箱刷新故障影响；三种调用方式均未改动文件。后续文档通过临时镜像生成统一差异，先执行 `git apply --check` 再应用，并逐次执行内容与格式校验。
+- 已创建 `_backups/step-13-process-model/pre-documentation-checkpoint`，含 22 个关键文件和 SHA-256 清单；已创建 `_backups/step-13-process-model/final` 最终快照：复制 28 个关键文件，对 6 个未复制的本地模型/完整数据产物登记 SHA-256，源文件与备份文件哈希逐项一致。
+- 按用户“先不提交”的要求，本阶段保持未提交、未推送；远端仍停留在 `7391559279c3a9389d9cb5df2e415d85ae81d824`。
+
+## 下一阶段
+
+- 阶段 6.2：建立知识库、证据融合和处置推荐接口。
+- 在浏览器运行时恢复后补做桌面/移动端视觉截图验收。
+- 仅在用户重新明确授权后提交并推送阶段 6.1。

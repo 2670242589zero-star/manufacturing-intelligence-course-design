@@ -120,3 +120,87 @@ test("rejects unsupported image data before inference", async () => {
     await writeInspections(before);
   }
 });
+
+test("exposes process-model status and forwards valid prediction features", async () => {
+  const expectedFeatures = {
+    iron_feed_pct: 55.2,
+    silica_feed_pct: 16.98,
+    starch_flow: 3019.53,
+    amina_flow: 557.434,
+    ore_pulp_flow: 395.713,
+    ore_pulp_ph: 10.0664,
+    ore_pulp_density: 1.74,
+    flotation_air_flow_avg: 265.09,
+    flotation_level_avg: 461.548
+  };
+  let captured;
+  const processAdapter = {
+    status: async () => ({ endpointConfigured: true, online: true, activeAdapter: "test-process-model" }),
+    predict: async (features) => {
+      captured = features;
+      return {
+        modelId: "process-quality-random-forest-v1",
+        prediction: { target: "silica_concentrate_pct", value: 1.99, rounded: 1.99, unit: "%" },
+        risk: { level: "low", label: "低风险", tone: "success" },
+        inputRangeWarnings: [],
+        globalFeatureImportance: [],
+        summary: "测试预测",
+        method: "test-process-model"
+      };
+    }
+  };
+  const injectedServer = createServer({ processQualityAdapter: processAdapter });
+  await new Promise((resolve) => injectedServer.listen(0, resolve));
+  try {
+    const url = "http://127.0.0.1:" + injectedServer.address().port;
+    const status = await (await fetch(url + "/api/process-quality/status")).json();
+    const response = await fetch(url + "/api/process-quality/predict", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ features: expectedFeatures })
+    });
+    const body = await response.json();
+    const invalid = await fetch(url + "/api/process-quality/predict", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ features: { iron_feed_pct: 55.2 } })
+    });
+    assert.equal(status.online, true);
+    assert.equal(response.status, 200);
+    assert.deepEqual(captured, expectedFeatures);
+    assert.equal(body.prediction.rounded, 1.99);
+    assert.equal(invalid.status, 400);
+  } finally {
+    await new Promise((resolve, reject) => injectedServer.close((error) => error ? reject(error) : resolve()));
+  }
+});
+
+test("exposes knowledge search and evidence-fusion recommendation contracts", async () => {
+  const knowledge = await (await fetch(baseUrl + "/api/knowledge?defectType=%E8%A1%A8%E9%9D%A2%E7%BA%B9%E7%90%86%E5%BC%82%E5%B8%B8&riskLevel=high")).json();
+  assert.ok(knowledge.count > 0);
+  assert.equal(knowledge.source, "knowledge/entries.json");
+
+  const response = await fetch(baseUrl + "/api/recommendations", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      context: { batchId: "DECISION-TEST", line: "压延线 A" },
+      vision: { risk: { level: "high", label: "高风险" }, detections: [{ type: "表面纹理异常", confidence: 0.91, area: 40 }] },
+      processQuality: { risk: { level: "medium", label: "中风险" }, prediction: { value: 2.4 }, inputRangeWarnings: [{ label: "矿浆 pH" }] }
+    })
+  });
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.fusion.risk.level, "high");
+  assert.equal(body.fusion.humanReviewRequired, true);
+  assert.ok(body.recommendations.length > 0);
+  assert.ok(body.recommendations[0].checks.length > 0);
+
+  const invalid = await fetch(baseUrl + "/api/recommendations", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ query: "x".repeat(201) })
+  });
+  assert.equal(invalid.status, 400);
+  assert.equal((await invalid.json()).error, "invalid_recommendation_query");
+});

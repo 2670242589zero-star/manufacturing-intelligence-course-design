@@ -1,0 +1,156 @@
+{
+  "recordId": "2026-08-30-stage-06-1-process-model",
+  "recordType": "original_summary",
+  "date": "2026-08-30",
+  "stage": "stage-06.1",
+  "stageSystem": "task_plan implementation stages",
+  "harness": "Codex + GitHub",
+  "model": "GPT-5.6sol",
+  "userRequest": "继续完善项目，进入下一阶段实现。",
+  "decision": {
+    "nextStage": "下载并训练工艺参数质量模型，导出部署格式并接入平台",
+    "reason": "task_plan.md 中阶段 6.1 是远端已验收状态后的下一个未完成阶段。",
+    "target": "silica_concentrate_pct",
+    "baseline": "RandomForestRegressor",
+    "split": "按时间顺序划分训练、验证和测试集",
+    "leakageControl": "默认排除 iron_concentrate_pct，不把后验质量关联当作可部署工艺特征"
+  },
+  "startingState": {
+    "repositoryHead": "7391559279c3a9389d9cb5df2e415d85ae81d824",
+    "localSampleRecords": 199,
+    "existingArchive": "data/local/mining-quality-source/quality-prediction.zip",
+    "existingArchiveStatus": "truncated_zip_missing_end_of_central_directory",
+    "pythonEnvironment": "cv_tutorial",
+    "available": [
+      "pandas",
+      "scikit-learn",
+      "joblib",
+      "numpy",
+      "onnxruntime"
+    ],
+    "missing": [
+      "skl2onnx"
+    ]
+  },
+  "dataEvidence": {
+    "completeArchive": "data/local/mining-quality-source/quality-prediction-kaggle.zip",
+    "archiveSha256": "fa1fb0c928d84366ec1bd315e0ed1380f5d5576525603458b49ea4cfe446d98e",
+    "trainingCsv": "data/local/mining-quality-source/full-20260830/MiningProcess_Flotation_Plant_Database.csv",
+    "trainingCsvSha256": "ae0231a0bd2e14aac39cf978d81db6c71907a42aade19327816692c4e30cb956",
+    "rawRows": 737453,
+    "rawColumns": 24,
+    "hourlyRows": 4097,
+    "timeRange": [
+      "2017-03-10T01:00:00",
+      "2017-09-09T23:00:00"
+    ]
+  },
+  "implementationProgress": [
+    "创建共享预处理与评估模块 training/process_quality_common.py",
+    "创建训练、候选参数选择、joblib/ONNX 导出和训练报告脚本 training/train_process_quality.py",
+    "训练脚本已通过 Python 3.10.20 py_compile",
+    "重新核验完整公开数据压缩包和正式训练 CSV 的 SHA-256",
+    "安装 skl2onnx 1.20.0 并完成三组随机森林候选训练",
+    "导出 joblib 与 ONNX opset 17，并完成独立 128 条样本的一致性验证",
+    "新增 Python 工艺质量推理服务、Node HTTP 适配器和平台 API 路由",
+    "完成 Dashboard 工艺预测页面与状态、指标、范围告警和特征重要性展示",
+    "使用前端默认 9 特征完成 Node 到 Python 端到端预测",
+    "补充项目 README、训练/推理文档、模型接入说明、模型卡和阶段自查",
+    "完成 23/23 Node 测试及发布前安全检查"
+  ],
+  "trainingResult": {
+    "selectedParameters": {
+      "n_estimators": 200,
+      "max_depth": 12,
+      "min_samples_leaf": 4
+    },
+    "validation": {
+      "mae": 0.7723139471638076,
+      "rmse": 1.0444301155358189,
+      "r2": -0.018068134587348572
+    },
+    "test": {
+      "mae": 0.8719386809358487,
+      "rmse": 1.1165252204455243,
+      "r2": 0.13100269828807254
+    },
+    "medianBaselineMae": 0.9710975609756098,
+    "maeImprovementOverBaselinePct": 10.211011130554331,
+    "onnxOpset": 17,
+    "independentConsistencyRows": 128,
+    "independentMaxAbsoluteDifference": 1.471423485277512E-06
+  },
+  "deploymentImplementation": {
+    "pythonService": "inference/process_quality_service.py",
+    "nodeAdapter": "algorithm/process-quality-adapter.js",
+    "statusEndpoint": "/api/process-quality/status",
+    "predictionEndpoint": "/api/process-quality/predict",
+    "failurePolicy": "模型未配置或不可用时返回 503，不生成伪预测"
+  },
+  "knownIssues": [
+    {
+      "issue": "原 quality-prediction.zip 缺少中央目录结束记录",
+      "resolution": "保留损坏文件作为证据，改用 Kaggle 官方公开接口重新下载的完整压缩包"
+    },
+    {
+      "issue": "本地沙箱辅助进程出现 helper_unknown_error",
+      "resolution": "使用经授权的本机执行环境继续只读检查和后续训练"
+    },
+    {
+      "issue": "Codex 浏览器运行时无法启动，返回 windows sandbox failed: helper_unknown_error: setup refresh had errors",
+      "resolution": "不伪造截图；完成 HTTP、DOM 字段映射和响应式 CSS 静态验收，记录限制并等待运行时恢复"
+    },
+    {
+      "issue": "apply_patch 受同一沙箱刷新故障影响",
+      "resolution": "三种失败调用均未改动文件；改用临时镜像生成统一差异，git apply --check 通过后应用并复核"
+    }
+  ],
+  "plannedActions": [
+    "阶段 6.2 建立知识库、证据融合和处置推荐接口",
+    "浏览器运行时恢复后补桌面与移动端截图",
+    "获得用户明确授权后再提交和推送阶段 6.1"
+  ],
+  "security": {
+    "rawDatasetUploaded": false,
+    "modelBinaryUploaded": false,
+    "credentialsRecorded": false,
+    "backupRequired": true
+  },
+  "status": "complete_local_uncommitted",
+  "verification": {
+    "nodeTests": "23/23 passed",
+    "javascriptSyntax": "passed",
+    "pythonSyntax": "passed",
+    "promptJson": "10/10 parsed",
+    "trainingReportJson": "parsed",
+    "endToEndPrediction": {
+      "value": 1.989,
+      "risk": "low",
+      "rangeWarnings": 0
+    },
+    "outOfRangePredictionWarnings": 4,
+    "invalidPayloadHttp": 400,
+    "credentialScan": "passed",
+    "gitDiffCheck": "passed",
+    "browserVisualAutomation": "blocked_by_local_sandbox_runtime"
+  },
+  "deliveryArtifacts": {
+    "modelCard": "docs/process-quality-model-card.md",
+    "trainingReport": "docs/process-quality-training-report.json",
+    "selfCheck": "阶段6.1自查.md",
+    "preDocumentationBackup": "_backups/step-13-process-model/pre-documentation-checkpoint",
+    "finalBackup": "_backups/step-13-process-model/final"
+  },
+  "publication": {
+    "committed": false,
+    "pushed": false,
+    "reason": "用户此前明确要求先不提交",
+    "remoteHead": "7391559279c3a9389d9cb5df2e415d85ae81d824"
+  },
+  "backupVerification": {
+    "path": "_backups/step-13-process-model/final",
+    "copiedFiles": 28,
+    "localArtifactsHashed": 6,
+    "sourceBackupSha256Match": true
+  }
+}

@@ -1,10 +1,22 @@
-const state = { inspections: [], latest: null, imageMetrics: null, imageName: "", imageData: "", imageDataPromise: Promise.resolve("") };
+const state = { inspections: [], latest: null, latestProcess: null, imageMetrics: null, imageName: "", imageData: "", imageDataPromise: Promise.resolve("") };
 const $ = (selector) => document.querySelector(selector);
 const formatTime = (value) => new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
 
 function setStatus(message, type = "") {
   const node = $("#formStatus");
+  node.textContent = message;
+  node.className = "form-status " + type;
+}
+
+function setProcessStatus(message, type = "") {
+  const node = $("#processFormStatus");
+  node.textContent = message;
+  node.className = "form-status " + type;
+}
+
+function setDecisionStatus(message, type = "") {
+  const node = $("#decisionStatus");
   node.textContent = message;
   node.className = "form-status " + type;
 }
@@ -179,6 +191,7 @@ async function runInspection(event) {
   renderMetrics();
   renderTrend();
   renderHistory();
+  loadRecommendations(result).catch((error) => setDecisionStatus(error.message, "error"));
   setStatus("分析完成，结果已写入检测记录。", "success");
   button.disabled = false;
 }
@@ -197,11 +210,113 @@ async function loadData() {
   }
 }
 
+function renderProcessPrediction(result) {
+  state.latestProcess = result;
+  $("#processPrediction").textContent = Number(result.prediction.rounded ?? result.prediction.value).toFixed(3);
+  const risk = $("#processRisk");
+  risk.textContent = result.risk.label;
+  risk.className = "risk-pill " + result.risk.level;
+  $("#processSummary").textContent = result.summary;
+  const warnings = result.inputRangeWarnings || [];
+  $("#processRangeState").textContent = warnings.length ? warnings.length + " 项越界" : "全部在训练范围内";
+  $("#processWarnings").innerHTML = warnings.length
+    ? warnings.map((item) => '<div class="detection-item"><strong>' + escapeHtml(item.label) +
+      '</strong><span>' + Number(item.value).toFixed(3) + ' / [' + Number(item.trainingMin).toFixed(3) + ', ' +
+      Number(item.trainingMax).toFixed(3) + ']</span></div>').join("")
+    : '<p class="empty-line">输入均位于训练数据范围内</p>';
+  renderContributors($("#processImportance"), (result.globalFeatureImportance || []).map((item) => ({
+    name: item.label,
+    value: Number(item.importance) * 100,
+    detail: (Number(item.importance) * 100).toFixed(1) + "%"
+  })));
+}
+
+function renderDecision(result) {
+  const risk = $("#decisionRisk");
+  risk.textContent = result.fusion.risk.label;
+  risk.className = "risk-pill " + result.fusion.risk.level;
+  $("#decisionSummary").textContent = result.fusion.humanReviewRequired
+    ? "当前建议需要授权人员复核，系统仅提供候选关联和检查顺序。"
+    : "当前证据支持低风险持续观察，仍需按现场质量规程执行。";
+  $("#decisionConfidence").textContent = (Number(result.fusion.confidence) * 100).toFixed(1) + "%";
+  $("#decisionSources").textContent = result.fusion.activeSources.join("、") || "无";
+  $("#decisionEvidence").innerHTML = result.fusion.evidence.length
+    ? result.fusion.evidence.map((item) => '<div class="detection-item"><strong>' + escapeHtml(item.label) +
+      '</strong><span>' + escapeHtml(item.source) + " · " + escapeHtml(item.strength) + "</span><small>" + escapeHtml(item.detail) + "</small></div>").join("")
+    : '<p class="empty-line">暂无证据</p>';
+  $("#decisionRecommendations").innerHTML = result.recommendations.length
+    ? result.recommendations.slice(0, 4).map((item) => '<div class="recommendation-item"><div class="recommendation-top"><strong>' +
+      escapeHtml(item.title) + '</strong><span class="priority-' + escapeHtml(item.priority) + '">' + escapeHtml(item.priority) +
+      '</span></div><p>' + escapeHtml(item.rationale) + '</p><ul>' + item.actions.slice(0, 2).map((action) => '<li>' + escapeHtml(action) + '</li>').join("") +
+      '</ul><small>证据等级 ' + escapeHtml(item.evidenceGrade) + " · 需人工批准</small></div>").join("")
+    : '<p class="empty-line">' + escapeHtml(result.fallbackMessage || "暂无推荐") + '</p>';
+}
+
+async function loadRecommendations(vision = state.latest) {
+  const response = await fetch("/api/recommendations", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ vision, processQuality: state.latestProcess, history: state.inspections.slice(0, 10), limit: 6 })
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "处置推荐服务返回错误");
+  renderDecision(result);
+  setDecisionStatus("推荐已生成，结果保留证据来源和人工复核要求。", "success");
+  return result;
+}
+
+async function loadProcessModelStatus() {
+  const response = await fetch("/api/process-quality/status");
+  const status = await response.json();
+  const badge = $("#processModelStatus");
+  if (status.online) {
+    badge.textContent = "模型在线";
+    badge.className = "risk-pill low";
+    const testMetrics = status.health?.evaluation?.test;
+    $("#processModelMetric").textContent = testMetrics
+      ? "MAE " + Number(testMetrics.mae).toFixed(3) + " · R² " + Number(testMetrics.r2).toFixed(3)
+      : "RandomForest 已加载";
+    return;
+  }
+  badge.textContent = status.endpointConfigured ? "服务离线" : "未配置";
+  badge.className = "risk-pill " + (status.endpointConfigured ? "high" : "medium");
+  $("#processModelMetric").textContent = status.endpointConfigured ? "等待 Python 服务" : "等待模型端点";
+}
+
+async function runProcessPrediction(event) {
+  event.preventDefault();
+  const button = $("#processPredictButton");
+  button.disabled = true;
+  setProcessStatus("正在请求 RandomForest 工艺质量模型…");
+  try {
+    const features = {};
+    document.querySelectorAll("[data-process-feature]").forEach((input) => {
+      features[input.dataset.processFeature] = Number(input.value);
+    });
+    const response = await fetch("/api/process-quality/predict", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ features })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "工艺质量模型返回错误");
+    renderProcessPrediction(result);
+    if (state.latest) loadRecommendations().catch((error) => setDecisionStatus(error.message, "error"));
+    setProcessStatus("预测完成。", "success");
+  } finally {
+    button.disabled = false;
+  }
+}
+
 $("#imageInput").addEventListener("change", onImageChange);
 $("#inspectionForm").addEventListener("submit", (event) => runInspection(event).catch((error) => {
   setStatus(error.message, "error");
   $("#runButton").disabled = false;
 }));
+$("#processQualityForm").addEventListener("submit", (event) => runProcessPrediction(event).catch((error) => {
+  setProcessStatus(error.message, "error");
+}));
+$("#recommendationButton").addEventListener("click", () => loadRecommendations().catch((error) => setDecisionStatus(error.message, "error")));
 $("#refreshButton").addEventListener("click", () => loadData().catch((error) => setStatus(error.message, "error")));
 document.querySelectorAll(".nav-item").forEach((item) => item.addEventListener("click", () => {
   document.querySelectorAll(".nav-item").forEach((node) => node.classList.remove("active"));
@@ -210,3 +325,8 @@ document.querySelectorAll(".nav-item").forEach((item) => item.addEventListener("
 }));
 $("#todayLabel").textContent = new Intl.DateTimeFormat("zh-CN", { dateStyle: "medium" }).format(new Date());
 loadData().catch((error) => setStatus(error.message, "error"));
+loadProcessModelStatus().catch(() => {
+  $("#processModelStatus").textContent = "状态未知";
+  $("#processModelStatus").className = "risk-pill high";
+  $("#processModelMetric").textContent = "状态接口不可用";
+});

@@ -62,7 +62,7 @@
     "finalSha256Verified": true
   },
   "publication": {
-    "commit": "b20649d feat: add knowledge fusion recommendations",
+    "commit": "local 1ee214b merge: synchronize final stage 6 publication",
     "remote": "origin/main",
     "committed": true,
     "pushed": true,

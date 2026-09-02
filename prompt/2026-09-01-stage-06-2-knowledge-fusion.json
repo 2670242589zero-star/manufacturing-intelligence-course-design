@@ -58,13 +58,15 @@
     "baseline": "_backups/step-14-knowledge-fusion/baseline",
     "core": "_backups/step-14-knowledge-fusion/core",
     "final": "_backups/step-14-knowledge-fusion/final",
-    "finalFileCount": 31,
+    "finalFileCount": 32,
     "finalSha256Verified": true
   },
   "publication": {
-    "committed": false,
-    "pushed": false,
-    "reason": "用户于 2026-09-02 明确授权收尾、提交并推送；等待本次提交完成"
+    "commit": "b20649d feat: add knowledge fusion recommendations",
+    "remote": "origin/main",
+    "committed": true,
+    "pushed": true,
+    "reason": "用户于 2026-09-02 明确授权收尾、提交并推送"
   },
-  "status": "complete_local_pending_publication"
+  "status": "published"
 }

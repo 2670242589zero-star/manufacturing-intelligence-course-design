@@ -3,6 +3,9 @@ const path = require("node:path");
 const fsp = require("node:fs/promises");
 const { getPipeline } = require("./algorithm/pipeline");
 const { createInferenceAdapter } = require("./algorithm/inference-adapter");
+const { createProcessQualityAdapter, validateFeatures } = require("./algorithm/process-quality-adapter");
+const { createKnowledgeBase } = require("./algorithm/knowledge-base");
+const { buildRecommendations } = require("./algorithm/recommendation");
 
 const PORT = Number(process.env.PORT || 4173);
 const ROOT = __dirname;
@@ -77,6 +80,18 @@ function validateInspection(payload) {
   }
 }
 
+function validateRecommendationPayload(payload) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) throw new Error("invalid_recommendation_payload");
+  if (payload.query !== undefined && (typeof payload.query !== "string" || payload.query.length > 200)) throw new Error("invalid_recommendation_query");
+  for (const key of ["vision", "processQuality"]) {
+    if (payload[key] !== undefined && (!payload[key] || typeof payload[key] !== "object" || Array.isArray(payload[key]))) throw new Error("invalid_recommendation_source");
+  }
+  for (const key of ["history"]) {
+    if (payload[key] !== undefined && (!Array.isArray(payload[key]) || payload[key].length > 20)) throw new Error("invalid_recommendation_history");
+  }
+  if (payload.limit !== undefined && (!Number.isInteger(Number(payload.limit)) || Number(payload.limit) < 1 || Number(payload.limit) > 20)) throw new Error("invalid_recommendation_limit");
+}
+
 async function serveStatic(req, res) {
   const urlPath = req.url === "/" ? "/index.html" : req.url.split("?")[0];
   const target = path.resolve(PUBLIC, "." + urlPath);
@@ -90,19 +105,43 @@ async function serveStatic(req, res) {
 
 function createServer(options = {}) {
   const inference = options.inferenceAdapter || createInferenceAdapter(options.inferenceOptions);
+  const processQuality = options.processQualityAdapter || createProcessQualityAdapter(options.processQualityOptions);
+  const knowledgeBase = options.knowledgeBase || createKnowledgeBase(options.knowledgeBaseOptions);
   return http.createServer(async (req, res) => {
     try {
       if (req.method === "GET" && req.url === "/api/health") return send(res, 200, { ok: true, service: "vision-quality-api", time: new Date().toISOString() });
       if (req.method === "GET" && req.url === "/api/pipeline") return send(res, 200, getPipeline());
       if (req.method === "GET" && req.url === "/api/model-status") return send(res, 200, inference.status());
+      if (req.method === "GET" && req.url === "/api/process-quality/status") return send(res, 200, await processQuality.status());
       if (req.method === "GET" && req.url === "/api/dataset") return send(res, 200, dataset);
       if (req.method === "GET" && req.url === "/api/dataset-sources") return send(res, 200, JSON.parse(await fsp.readFile(SOURCES_FILE, "utf8")));
+      if (req.method === "GET" && (req.url === "/api/knowledge" || req.url.startsWith("/api/knowledge?"))) {
+        const url = new URL(req.url, "http://localhost");
+        const result = knowledgeBase.search({
+          query: url.searchParams.get("query") || "",
+          riskLevel: url.searchParams.get("riskLevel") || "",
+          defectTypes: url.searchParams.getAll("defectType"),
+          processSignals: url.searchParams.getAll("processSignal"),
+          limit: url.searchParams.get("limit") || 6
+        });
+        return send(res, 200, { ...result, source: "knowledge/entries.json", auditNote: "规则条目用于候选关联和人工复核，不自动确定根因。" });
+      }
       if (req.method === "GET" && req.url === "/api/inspections") return send(res, 200, { items: await readInspections() });
       if (req.method === "GET" && req.url === "/api/summary") {
         const items = await readInspections();
         const riskCounts = items.reduce((counts, item) => { const level = item.risk?.level || "unknown"; counts[level] = (counts[level] || 0) + 1; return counts; }, {});
         const contributors = items.flatMap((item) => item.contributors || []).reduce((result, item) => { result[item.name] = (result[item.name] || 0) + Number(item.value || 0); return result; }, {});
         return send(res, 200, { count: items.length, averageScore: items.length ? Math.round(items.reduce((sum, item) => sum + item.qualityScore, 0) / items.length) : 0, riskCounts, topContributor: Object.entries(contributors).sort((a, b) => b[1] - a[1])[0]?.[0] || null });
+      }
+      if (req.method === "POST" && req.url === "/api/process-quality/predict") {
+        const payload = await bodyOf(req);
+        const features = validateFeatures(payload.features);
+        return send(res, 200, await processQuality.predict(features));
+      }
+      if (req.method === "POST" && req.url === "/api/recommendations") {
+        const payload = await bodyOf(req);
+        validateRecommendationPayload(payload);
+        return send(res, 200, buildRecommendations(payload, knowledgeBase));
       }
       if (req.method === "POST" && req.url === "/api/inspect") {
         const payload = await bodyOf(req);
@@ -116,8 +155,10 @@ function createServer(options = {}) {
       if (req.method === "GET") return serveStatic(req, res);
       return send(res, 405, { error: "method_not_allowed" });
     } catch (error) {
-      const status = error.message.startsWith("invalid_") || error.message === "request_too_large" ? 400 : 500;
-      return send(res, status, { error: status === 400 ? error.message : "server_error", message: error.message });
+      const status = error.message.startsWith("invalid_") || error.message === "request_too_large"
+        ? 400
+        : error.message.startsWith("process_model_") ? 503 : 500;
+      return send(res, status, { error: status === 500 ? "server_error" : error.message, message: error.message });
     }
   });
 }
